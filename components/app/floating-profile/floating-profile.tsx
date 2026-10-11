@@ -97,37 +97,30 @@ export function FloatingProfile({
   className,
   ...props
 }: FloatingProfileProps) {
-  // 부모가 `open`을 갱신해주지 않는 사용처(스토리 args 고정 등)에서도 아바타를
-  // 클릭하면 즉시 시각적으로 반응하도록, prop을 초깃값으로 받아 내부 상태로도
-  // 관리합니다(Figma상 클릭 시 열림/닫힘이 즉각 토글되는 것이 핵심 동작이라
-  // "제어형이라 부모가 안 갱신하면 안 열린다"는 상태가 오히려 버그에 가깝습니다).
-  // 부모가 이후 `open` prop을 실제로 바꾸면 그 값으로 다시 동기화됩니다.
+  // 순수 제어형이 아니다 — 부모가 `open`을 갱신하지 않는 사용처(스토리 args 고정 등)
+  // 에서도 클릭이 즉시 반응해야 해서 prop을 초깃값으로 받아 내부 상태로도 관리하고,
+  // 부모가 `open`을 실제로 바꾸면 그 값으로 다시 동기화한다.
   const [internalOpen, setInternalOpen] = React.useState(openProp);
   React.useEffect(() => {
     setInternalOpen(openProp);
   }, [openProp]);
   const open = internalOpen;
 
-  // 카드가 닫힐 때 즉시 사라지지 않고 `animate-out`이 끝난 뒤에 실제로 마운트
-  // 해제하기 위한 상태(Figma는 정적 디자인이라 모션 스펙이 없음 — 클릭 시 "뚝뚝
-  // 끊기듯" 즉시 나타나던 것을 shadcn/ui 계열 관례(`data-[state=open|closed]` +
-  // tw-animate-css의 animate-in/animate-out)로 부드럽게 만든 것).
+  // `animate-out`이 끝난 뒤에 언마운트하기 위한 상태 — 바로 언마운트하면
+  // exit 애니메이션이 재생되지 않는다.
   const [mounted, setMounted] = React.useState(open);
   React.useEffect(() => {
     if (open) setMounted(true);
   }, [open]);
 
   const resolvedCtaLabel = ctaLabel ?? "Create a post";
-  // "no profile" 상태(avatarSrc 없음): Figma에 Open=true 대응 디자인이 없어
-  // 아바타 버블 클릭(카드 열기)을 실제로 비활성화합니다.
+  // 프로필 이미지가 없으면 펼칠 카드 디자인이 없어 클릭 자체를 막는다.
   const hasAvatar = Boolean(avatarSrc);
 
   const setOpen = (next: boolean) => {
     setInternalOpen(next);
     onOpenChange?.(next);
   };
-
-  // 보조 버튼(공유/Edit Assets/Edit Goal) 톤: background-default/border-default/text-default.
   const secondaryButtonClassName = cn(
     "bg-[var(--gb-background-default)] border-[var(--gb-border-default)]",
     "text-[var(--gb-text-default)]",
@@ -183,12 +176,9 @@ export function FloatingProfile({
             "border border-[var(--gb-border-selected)] bg-[var(--gb-background-subtlest)]",
             "px-[var(--gb-spacing-12)] pb-[var(--gb-spacing-8)] pt-[var(--gb-spacing-4)]",
             "shadow-[var(--gb-shadow-md)]",
-            // 아바타 버블은 항상 페이지상 같은 자리에 고정되어야 하므로,
-            // 카드를 페이지 레벨에서 감싸 스크롤하는 대신 카드 자신의
-            // 높이를 뷰포트 기준으로 제한하고 내부에서만 스크롤한다. top이 아바타
-            // 기준 0이라 카드가 쓸 수 있는 최대 높이도 페이지의 top 오프셋과 대칭인
-            // spacing-6만큼만 아래 여백을 남긴다(ScrollableDetailView와 동일하게
-            // 네이티브 스크롤바는 숨기고 커스텀 트랙 없이 휠 스크롤만 지원).
+            // 아바타 버블이 페이지상 같은 자리에 고정되어야 해서, 페이지를
+            // 스크롤하는 대신 카드 높이를 뷰포트 기준으로 제한하고 내부에서만
+            // 스크롤한다. 아래 여백은 페이지의 top 오프셋과 대칭으로 맞춘다.
             "max-h-[calc(100vh-var(--gb-spacing-6)*2)] overflow-y-auto overscroll-contain",
             "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
             // fill-mode-forwards 필수: 기본값(none)이면 exit 애니메이션이 끝나는

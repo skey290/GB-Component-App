@@ -10,8 +10,7 @@ import type { NotiDropdownItem } from "@/components/app/noti-dropdown";
 const FIGMA_URL =
   "https://www.figma.com/design/G9YNa2vjdqDjnML9y5hXJ4/%F0%9F%93%8C-GB_Design-System--Atom-?node-id=616-3399";
 
-// Figma GNB 노드(616:3399) 실측 — Assets/Compass는 /public/icons.svg 커스텀 벡터,
-// 나머지는 lucide 표준 아이콘과 일치.
+// Assets/Compass는 /public/icons.svg 커스텀 벡터, 나머지는 lucide 표준 아이콘.
 const AssetIcon = createSpriteIcon("asset-icon");
 const CompassIcon = createSpriteIcon("compass-icon");
 

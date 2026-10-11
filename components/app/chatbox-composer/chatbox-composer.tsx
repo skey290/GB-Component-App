@@ -189,7 +189,6 @@ export function ChatboxComposer(props: ChatboxComposerProps) {
                   // 예외: Chatbox 전체가 다크여도 이 삭제 배지만 항상 라이트 고정
                   "border-[length:var(--gb-border-1)] border-solid border-[var(--gb-color-neutral-200)]",
                   "bg-[var(--gb-color-white)]",
-                  // Figma 예시 오프셋(-5px/-5.34px), 매칭 토큰 없어 근사치 사용
                   "-top-1.5 -right-1.5",
                 )}
               >

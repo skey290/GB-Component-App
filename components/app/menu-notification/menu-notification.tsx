@@ -54,8 +54,6 @@ export const MenuNotification = React.forwardRef<
       type="button"
       disabled={isDisabled}
       aria-current={isActive ? "true" : undefined}
-      // type="icon"에는 시각적 라벨이 없으므로 접근성 이름을 보장하기 위해
-      // label을 기본 aria-label로 사용 (호출부에서 명시적으로 덮어쓸 수 있음)
       aria-label={ariaLabel ?? (type === "icon" ? label : undefined)}
       className={cn(
         "inline-flex items-center outline-none transition-colors",

@@ -49,7 +49,6 @@ export function AssetHistoryDrawer({
     <div
       className={cn(
         "dark flex h-full flex-col items-start gap-[var(--gb-spacing-4)]",
-        // Figma 확정값 407px
         "w-[407px] bg-[var(--gb-background-subtler)]",
         "py-[var(--gb-spacing-6)] pr-[var(--gb-spacing-2)] pl-[var(--gb-spacing-7)]",
         className,

@@ -48,8 +48,7 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
     const [isHovered, setIsHovered] = React.useState(false);
     const isActive = status === "active";
     const isDisabled = status === "disabled";
-    // Figma에 hover가 없어 active를 그대로 따름 — 시각 전용 플래그(aria-current는
-    // 실제 선택 여부인 isActive를 그대로 써야 하므로 별도 유지)
+    // 시각 전용 플래그 — `aria-current`에는 쓰지 않는다(실제 선택 여부는 `isActive`).
     const showActiveStyle = isActive || isHovered;
     const isTextOnly = type === "text";
     const isExpanded = type === "icon-with-text";
@@ -115,10 +114,9 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
             <span className={cn("truncate", labelTextClass)}>{label}</span>
           )
         ) : hasLabel ? (
-          // `type`이 icon ↔ icon-with-text로 바뀌어도 라벨은 항상 마운트해두고
-          // grid-template-columns(0fr↔1fr)로 폭을, padding-left로 아이콘과의 간격을,
-          // opacity로 텍스트를 함께 트랜지션 — 조건부 렌더로는 CSS 트랜지션이
-          // 불가능해서 쓰는 트릭. 간격을 padding-left로 주는 이유는 위 주석 참고.
+          // 라벨은 항상 마운트해두고 grid-template-columns(0fr↔1fr)로 폭을,
+          // padding-left로 간격을, opacity로 텍스트를 함께 트랜지션한다 —
+          // 조건부 렌더로는 CSS 트랜지션이 걸리지 않는다.
           <span
             aria-hidden={isExpanded ? undefined : "true"}
             className="grid transition-[grid-template-columns,padding-left] duration-200 ease-linear"

@@ -27,9 +27,6 @@ export interface NotiDropdownProps {
   onSettingsClick?: () => void;
   className?: string;
 }
-
-// Figma 확정값: 6개 행 초과 시 스크롤 — 리스트/스크롤바 트랙이
-// 공유하는 높이값 (select.tsx와 동일 계산 관례)
 const LIST_MAX_HEIGHT_CLASS =
   "max-h-[calc((var(--gb-spacing-8)*6)+(var(--gb-spacing-2)*5)+(var(--gb-spacing-1)*2))]";
 const SCROLLBAR_TRACK_HEIGHT_CLASS =
@@ -78,8 +75,7 @@ export function NotiDropdown({
         "dark flex w-[300px] flex-col items-start gap-[var(--gb-spacing-2)]",
         "rounded-[var(--gb-radius-scale-md)] border-[length:var(--gb-border-1)] border-[var(--gb-border-default)] border-solid",
         "bg-[var(--gb-background-overlay)] py-[var(--gb-spacing-1)]",
-        // Figma 그림자(0 4px 3px + 0 2px 2px, 10% 블랙)와 정확히 일치하는 토큰이
-        // 없어 크기가 가장 가까운 --shadow-md로 근사
+        // 디자인 그림자와 정확히 일치하는 토큰이 없어 가장 가까운 값으로 근사한다.
         "shadow-[var(--gb-shadow-md)]",
         className,
       )}
