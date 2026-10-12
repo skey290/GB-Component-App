@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Settings } from "lucide-react";
+import { Megaphone, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Tabs } from "@/components/ui/tabs";
@@ -126,12 +126,10 @@ export function NotiDropdown({
                   "hover:bg-[var(--gb-background-mute)] hover:text-[var(--gb-text-static-white)]",
                 )}
               >
-                <svg
+                <Megaphone
                   aria-hidden="true"
                   className="size-[var(--gb-spacing-3)] shrink-0"
-                >
-                  <use href="/icons.svg#megaphone-icon" />
-                </svg>
+                />
                 <span className="min-w-0 flex-1 truncate text-xs-regular">
                   {item.label}
                 </span>
