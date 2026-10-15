@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Chatbox, type ChatboxProps } from "@/components/ui/chatbox";
@@ -60,10 +60,10 @@ export type ChatboxComposerProps = ChatboxComposerSharedProps &
       }
     | {
         variant: "sentence-option";
-        /** 제어 컴포넌트로 사용할 선택된 행 인덱스 */
-        selectedSentenceOption?: number;
-        /** 비제어 컴포넌트로 사용할 초기 선택 인덱스 */
-        defaultSelectedSentenceOption?: number;
+        /** 제어 컴포넌트로 사용할 선택된 행 인덱스. `null`은 선택 없음 */
+        selectedSentenceOption?: number | null;
+        /** 비제어 컴포넌트로 사용할 초기 선택 인덱스. 기본값은 선택 없음(`null`) */
+        defaultSelectedSentenceOption?: number | null;
         /** sentence option 선택이 바뀔 때 호출됩니다 */
         onSentenceOptionChange?: (index: number) => void;
       }
@@ -75,8 +75,8 @@ type ChatboxComposerInternalProps = ChatboxComposerSharedProps & {
   selectedChip?: number;
   defaultSelectedChip?: number;
   onChipChange?: (index: number) => void;
-  selectedSentenceOption?: number;
-  defaultSelectedSentenceOption?: number;
+  selectedSentenceOption?: number | null;
+  defaultSelectedSentenceOption?: number | null;
   onSentenceOptionChange?: (index: number) => void;
 };
 
@@ -91,7 +91,7 @@ export function ChatboxComposer(props: ChatboxComposerProps) {
     defaultSelectedChip = 0,
     onChipChange,
     selectedSentenceOption,
-    defaultSelectedSentenceOption = 0,
+    defaultSelectedSentenceOption = null,
     onSentenceOptionChange,
     disabled = false,
     ...chatboxProps
@@ -231,9 +231,9 @@ export function ChatboxComposer(props: ChatboxComposerProps) {
                 aria-pressed={isSelected}
                 onClick={() => handleSentenceClick(index)}
                 className={cn(
-                  "flex h-[36px] w-full items-center justify-between gap-[var(--gb-spacing-2)]",
+                  "flex h-[36px] w-full items-center justify-center gap-[var(--gb-spacing-2)]",
                   "rounded-[var(--gb-radius-scale-lg)] px-[var(--gb-spacing-4)]",
-                  "text-sm-medium text-left transition-colors",
+                  "text-sm-medium text-center transition-colors",
                   "border-[length:var(--gb-border-1)] border-solid",
                   isSelected
                     ? "border-transparent bg-[var(--gb-background-mute)] text-[var(--gb-text-static-white)]"
@@ -242,10 +242,6 @@ export function ChatboxComposer(props: ChatboxComposerProps) {
                 )}
               >
                 <span className="truncate">{label}</span>
-                <ChevronRight
-                  className="size-[var(--gb-spacing-4)] shrink-0"
-                  aria-hidden="true"
-                />
               </button>
             );
           })}

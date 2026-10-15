@@ -181,6 +181,22 @@ describe("ChatboxComposer", () => {
       ).toBeInTheDocument();
     });
 
+    it("has no row selected by default", () => {
+      render(<ChatboxComposer variant="sentence-option" />);
+
+      const labels = [
+        "I would like to change Asset Image",
+        "I would like to change Short Text (One Liner)",
+        "I would like to change Long Text (Description)",
+      ];
+      for (const name of labels) {
+        expect(screen.getByRole("button", { name })).toHaveAttribute(
+          "aria-pressed",
+          "false",
+        );
+      }
+    });
+
     it("switches selection on click and calls onSentenceOptionChange", async () => {
       const user = userEvent.setup();
       const onSentenceOptionChange = vi.fn();
