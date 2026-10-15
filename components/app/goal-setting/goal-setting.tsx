@@ -3,9 +3,9 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Chatbox } from "@/components/ui/chatbox";
-import { Chips } from "@/components/ui/chips";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 
@@ -29,8 +29,8 @@ export const TARGETED_FOLLOWERS_LABELS = [
   "5,000",
   "10,000",
   "50,000",
-  "1,000,000",
-  "1,000,000+",
+  "1M",
+  "1M+",
 ] as const;
 
 interface GoalSettingSharedProps {
@@ -51,14 +51,14 @@ export interface GoalSettingFilledProps extends GoalSettingSharedProps {
   type: "filled";
   /**
    * 자기소개 1문단 서술 텍스트. `{brandPosition}`, `{target}` 자리에 아래
-   * brandPosition/target 값이 Chips로 자동 삽입됩니다 — 값은 여기서 중복
+   * brandPosition/target 값이 Badge로 자동 삽입됩니다 — 값은 여기서 중복
    * 입력하지 않습니다.
    */
   paragraph1Template: string;
   /**
    * 자기소개 2문단 서술 텍스트. `{postingSummary}`(Posting Frequency/카운터
    * 기반 "3 time(s) a day"), `{targetedFollowers}`(Targeted Followers
-   * 슬라이더 값), `{trackingFrequency}` 자리에 해당 값이 Chips로 자동
+   * 슬라이더 값), `{trackingFrequency}` 자리에 해당 값이 Badge로 자동
    * 삽입됩니다.
    */
   paragraph2Template: string;
@@ -163,7 +163,7 @@ function FrequencyGroup<T extends string>({
 
 const PARAGRAPH_PLACEHOLDER_PATTERN = /\{(\w+)\}/g;
 
-/** `{key}` 자리에 해당 값을 Chips로 끼워 넣어 문단을 조립합니다. */
+/** `{key}` 자리에 해당 값을 Badge로 끼워 넣어 문단을 조립합니다. */
 function renderParagraphTemplate(
   template: string,
   values: Record<string, string>,
@@ -180,13 +180,14 @@ function renderParagraphTemplate(
     const value = values[key];
     nodes.push(
       value !== undefined ? (
-        <Chips
+        <Badge
           key={`chip-${chipIndex++}`}
-          variant="primary"
-          className="h-[20px] align-middle"
+          variant="default"
+          size="20"
+          className="px-[var(--gb-spacing-4)] text-sm-medium align-middle"
         >
           {value}
-        </Chips>
+        </Badge>
       ) : (
         token
       ),
@@ -331,7 +332,10 @@ function GoalSettingFilledView({
             target: currentTarget,
           })}
         </p>
-        <p className="text-base-regular text-[var(--gb-text-default)]">
+        <p
+          data-testid="paragraph2"
+          className="text-base-regular text-[var(--gb-text-default)]"
+        >
           {renderParagraphTemplate(paragraph2Template, {
             postingSummary,
             targetedFollowers,

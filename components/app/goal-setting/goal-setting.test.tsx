@@ -64,11 +64,12 @@ describe("GoalSetting", () => {
       screen.getByText("Finance-Fluent Modeling Partner"),
     ).toBeInTheDocument();
     expect(screen.getByText("early-stage SaaS founders")).toBeInTheDocument();
+    const paragraph2 = screen.getByTestId("paragraph2");
+    expect(within(paragraph2).getByText("5,000")).toBeInTheDocument();
+    expect(within(paragraph2).getByText("monthly")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "5,000" }),
+      within(paragraph2).getByText("3 times a day"),
     ).toBeInTheDocument();
-    expect(screen.getByText("monthly")).toBeInTheDocument();
-    expect(screen.getByText("3 times a day")).toBeInTheDocument();
   });
 
   it("keeps the inline chip values in sync when the underlying fields change", () => {
@@ -83,7 +84,7 @@ describe("GoalSetting", () => {
       />,
     );
     expect(
-      screen.getByRole("button", { name: "1,000" }),
+      within(screen.getByTestId("paragraph2")).getByText("1,000"),
     ).toBeInTheDocument();
 
     rerender(
@@ -97,7 +98,7 @@ describe("GoalSetting", () => {
       />,
     );
     expect(
-      screen.getByRole("button", { name: "50,000" }),
+      within(screen.getByTestId("paragraph2")).getByText("50,000"),
     ).toBeInTheDocument();
   });
 
