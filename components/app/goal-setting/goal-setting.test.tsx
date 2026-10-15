@@ -21,11 +21,29 @@ describe("GoalSetting", () => {
       <GoalSetting type="empty" onSubmitDescription={onSubmitDescription} />,
     );
 
-    const textarea = screen.getByPlaceholderText("Please share your ideas.");
+    const textarea = screen.getByRole("textbox");
     await user.type(textarea, "hello");
     await user.click(screen.getByRole("button", { name: "전송" }));
 
     expect(onSubmitDescription).toHaveBeenCalledWith("hello");
+  });
+
+  it("does not show a redundant placeholder in the empty state (guidance text already covers it)", () => {
+    render(<GoalSetting type="empty" />);
+
+    expect(
+      screen.queryByPlaceholderText("Please share your ideas."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders a Save button in the empty state and calls onSave when clicked", async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    render(<GoalSetting type="empty" onSave={onSave} />);
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
   });
 
   it("fills paragraph placeholders with the brandPosition/target values, not separate free text", () => {

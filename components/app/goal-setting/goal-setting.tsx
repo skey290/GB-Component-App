@@ -44,6 +44,7 @@ export interface GoalSettingEmptyProps extends GoalSettingSharedProps {
   type?: "empty";
   /** Chatbox 전송(✨) 시 입력된 설명과 함께 호출됩니다 */
   onSubmitDescription?: (description: string) => void;
+  onSave?: () => void;
 }
 
 export interface GoalSettingFilledProps extends GoalSettingSharedProps {
@@ -182,7 +183,7 @@ function renderParagraphTemplate(
         <Chips
           key={`chip-${chipIndex++}`}
           variant="primary"
-          className="h-[20px]"
+          className="h-[20px] align-middle"
         >
           {value}
         </Chips>
@@ -209,6 +210,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function GoalSettingEmptyView({
   onClose,
   onSubmitDescription,
+  onSave,
   className,
 }: GoalSettingEmptyProps) {
   const [description, setDescription] = React.useState("");
@@ -221,17 +223,12 @@ function GoalSettingEmptyView({
         value={description}
         onValueChange={setDescription}
         onSend={() => onSubmitDescription?.(description)}
-      >
-        <p className="text-xs-regular w-full text-[var(--gb-text-subtle)]">
-          Describe the Self you want to create — who you want to be known as,
-          what you want to share, and what you want to achieve.
-        </p>
-        <p className="text-xs-regular w-full text-[var(--gb-text-subtle)]">
-          e.g. A style enthusiast known for everyday fashion inspiration,
-          sharing outfit ideas and styling tips with people who want to look
-          good in real life.
-        </p>
-      </Chatbox>
+        placeholder="Describe the Self you want to create — who you want to be known as, what you want to share, and what you want to achieve. e.g. A style enthusiast known for everyday fashion inspiration, sharing outfit ideas and styling tips with people who want to look good in real life."
+        className="w-full"
+      />
+      <Button type="button" variant="primary" onClick={onSave} className="w-full">
+        Save
+      </Button>
     </div>
   );
 }
@@ -353,9 +350,9 @@ function GoalSettingFilledView({
           showLink={false}
           textfieldValue={currentBrandPosition}
           onTextfieldValueChange={handleBrandPositionChange}
+          textfieldPlaceholder="Brand Position"
           file={brandPositionFile}
           onFileChange={onBrandPositionFileChange}
-          uploadPlaceholder="File.pdf"
           className="w-full"
         />
         <Input
@@ -365,9 +362,9 @@ function GoalSettingFilledView({
           showLink={false}
           textfieldValue={currentTarget}
           onTextfieldValueChange={handleTargetChange}
+          textfieldPlaceholder="Target"
           file={targetFile}
           onFileChange={onTargetFileChange}
-          uploadPlaceholder="File.pdf"
           className="w-full"
         />
       </div>
@@ -419,17 +416,28 @@ function GoalSettingFilledView({
           className="w-full"
         />
         <div className="relative h-[var(--gb-spacing-4)] w-full">
-          {TARGETED_FOLLOWERS_LABELS.map((label, index) => (
-            <span
-              key={label}
-              style={{
-                left: `${(index / (TARGETED_FOLLOWERS_LABELS.length - 1)) * 100}%`,
-              }}
-              className="text-xs-regular absolute -translate-x-1/2 whitespace-nowrap text-[var(--gb-text-subtle)]"
-            >
-              {label}
-            </span>
-          ))}
+          {TARGETED_FOLLOWERS_LABELS.map((label, index) => {
+            const isFirst = index === 0;
+            const isLast = index === TARGETED_FOLLOWERS_LABELS.length - 1;
+            return (
+              <span
+                key={label}
+                style={{
+                  left: `${(index / (TARGETED_FOLLOWERS_LABELS.length - 1)) * 100}%`,
+                }}
+                className={cn(
+                  "text-xs-regular absolute whitespace-nowrap text-[var(--gb-text-subtle)]",
+                  isFirst
+                    ? "translate-x-0"
+                    : isLast
+                      ? "-translate-x-full"
+                      : "-translate-x-1/2",
+                )}
+              >
+                {label}
+              </span>
+            );
+          })}
         </div>
       </div>
 
