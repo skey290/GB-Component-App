@@ -211,7 +211,6 @@ export function ChatboxComposer(props: ChatboxComposerProps) {
               variant="secondary"
               selected={currentChip === index}
               disabled={disabled}
-              showDeleteIcon
               onClick={() => handleChipClick(index)}
             >
               {label}

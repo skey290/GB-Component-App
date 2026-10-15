@@ -66,7 +66,7 @@ function GnbHistoryPanel({
   return (
     <div
       className={cn(
-        "dark ml-[20px] flex h-full flex-col items-start gap-[var(--gb-spacing-4)]",
+        "dark flex h-full flex-col items-start gap-[var(--gb-spacing-4)]",
         "w-[407px] bg-[var(--gb-background-subtler)]",
         "py-[var(--gb-spacing-6)] pr-[var(--gb-spacing-2)] pl-[var(--gb-spacing-7)]",
       )}
@@ -234,6 +234,12 @@ export function Gnb({
   >(null);
   const menuType = expanded ? "icon-with-text" : "icon";
 
+  // Figma 실측: 토글은 "현재 보이는 패널 전체 폭(레일 48/250px + 열려있으면 드로어
+  // 407px) + 20px" 위치에 고정된다 — 레일-패널 사이는 0px(완전 플러시)이고, 20px
+  // 간격은 패널과 토글 사이의 것이다.
+  const railWidth = expanded ? 250 : 48;
+  const toggleLeft = railWidth + (activeDrawer ? 407 : 0) + 20;
+
   const toggleDrawer = (drawer: "work-history" | "self-archive") => {
     setActiveDrawer((prev) => (prev === drawer ? null : drawer));
   };
@@ -347,17 +353,16 @@ export function Gnb({
       {/* Work History/Self Archive 트리거 — GNB 패널 바깥 우측에 독립적으로 떠
           있는 2연 세그먼트(`Toggle`). 메인 패널이 overflow-hidden이라 그 안에
           두면 패널 박스 밖으로 나온 부분이 잘려서, 바깥 래퍼 기준 절대위치로
-          둔다(left를 패널의 현재 폭값으로 직접 계산 — 패널 자신의 width
-          트랜지션과 별개로 항상 패널 바로 옆에 붙는다). 둘 다 닫힘에서 시작,
-          누른 쪽만 열리고 같은 걸 다시 누르면 닫힌다(상호 배타 + 재클릭 닫기는
-          selectionMode로 표현이 안 돼 activeDrawer 상태로 직접 제어). */}
+          둔다(left는 위에서 계산한 toggleLeft — 레일 폭 + 드로어가 열려있으면
+          패널 폭까지 더해 항상 현재 보이는 패널 바로 옆 20px에 붙는다). 둘 다
+          닫힘에서 시작, 누른 쪽만 열리고 같은 걸 다시 누르면 닫힌다(상호 배타 +
+          재클릭 닫기는 selectionMode로 표현이 안 돼 activeDrawer 상태로 직접
+          제어). */}
       <Toggle
         type="icon"
         selectionMode="multiple"
-        className={cn(
-          "absolute top-[20px] z-20",
-          expanded ? "left-[270px]" : "left-[68px]",
-        )}
+        className="absolute top-[20px] z-20 transition-[left] duration-200 ease-linear"
+        style={{ left: `${toggleLeft}px` }}
         items={[
           {
             icon: <History aria-hidden="true" className="size-full" />,
