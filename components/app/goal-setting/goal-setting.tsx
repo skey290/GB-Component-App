@@ -134,7 +134,7 @@ function FrequencyGroup<T extends string>({
 }) {
   return (
     <div
-      role="group"
+      role="radiogroup"
       aria-label={label}
       className="flex w-full items-center gap-[var(--gb-spacing-2)]"
     >
@@ -145,7 +145,8 @@ function FrequencyGroup<T extends string>({
             key={option}
             type="button"
             variant="outline"
-            aria-pressed={isSelected}
+            role="radio"
+            aria-checked={isSelected}
             onClick={() => onChange?.(option)}
             className={cn(
               "flex-1",

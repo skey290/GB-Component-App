@@ -135,10 +135,10 @@ describe("GoalSetting", () => {
       />,
     );
 
-    const postingGroup = screen.getByRole("group", {
+    const postingGroup = screen.getByRole("radiogroup", {
       name: "Posting Frequency",
     });
-    await user.click(within(postingGroup).getByRole("button", { name: "Weekly" }));
+    await user.click(within(postingGroup).getByRole("radio", { name: "Weekly" }));
 
     expect(onPostingFrequencyChange).toHaveBeenCalledWith("Weekly");
   });
@@ -180,16 +180,16 @@ describe("GoalSetting", () => {
     await user.click(screen.getByRole("button", { name: "증가" }));
     expect(screen.getByText("4 time(s) a day")).toBeInTheDocument();
 
-    const trackingGroup = screen.getByRole("group", {
+    const trackingGroup = screen.getByRole("radiogroup", {
       name: "Tracking Frequency",
     });
     await user.click(
-      within(trackingGroup).getByRole("button", { name: "Weekly" }),
+      within(trackingGroup).getByRole("radio", { name: "Weekly" }),
     );
     expect(
-      within(trackingGroup).getByRole("button", {
+      within(trackingGroup).getByRole("radio", {
         name: "Weekly",
-        pressed: true,
+        checked: true,
       }),
     ).toBeInTheDocument();
   });
