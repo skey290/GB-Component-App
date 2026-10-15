@@ -16,9 +16,8 @@ const DotBellIcon = createSpriteIcon("dot-bell-icon");
  * `dot-bell-icon` 에셋을 쓰고, 없을 때(Figma엔 없는 상태)는 순수 `Bell` 아이콘을
  * 씁니다 — `showDot`으로 개별 제어 가능하고, disabled에는 항상 숨겨집니다.
  *
- * GNB Expand 토글 시 라벨이 트랜지션 없이 팝인/팝아웃하던 문제를
- * MenuButton과 동일한 grid-template-columns 트릭으로 해결 — 상세 사유는
- * `menu-button.tsx` 주석 참고.
+ * 라벨은 항상 마운트해두고 opacity만 트랜지션한다 — 폭은 GNB 루트의 width
+ * 트랜지션을 따라 버튼 자체가 overflow-hidden으로 가린다(`MenuButton`과 동일).
  */
 export interface MenuNotificationProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -61,10 +60,10 @@ export const MenuNotification = React.forwardRef<
       aria-current={isActive ? "true" : undefined}
       aria-label={ariaLabel ?? (type === "icon" ? label : undefined)}
       className={cn(
-        "inline-flex items-center outline-none transition-colors",
+        "inline-flex items-center overflow-hidden outline-none transition-colors",
         "focus-visible:shadow-[var(--gb-shadow-focus-ring)]",
         "disabled:pointer-events-none disabled:cursor-not-allowed",
-        type === "text" && "gap-[var(--gb-spacing-3)]",
+        label && "gap-[var(--gb-spacing-3)]",
         className,
       )}
       {...props}
@@ -105,30 +104,20 @@ export const MenuNotification = React.forwardRef<
           />
         )}
       </span>
-      {/* GNB Expand 토글 시 type이 icon ↔ text로 바뀌는데, 라벨을 조건부 렌더하면
-          트랜지션이 불가능해 항상 마운트해두고 grid-template-columns(0fr↔1fr)로
-          폭+opacity를 함께 접고 펼칩니다 (MenuButton과 동일 패턴). */}
       {label ? (
         <span
           aria-hidden={type === "text" ? undefined : "true"}
-          className="grid transition-[grid-template-columns] duration-200 ease-out"
-          style={{ gridTemplateColumns: type === "text" ? "1fr" : "0fr" }}
+          className={cn(
+            "min-w-0 truncate whitespace-nowrap transition-opacity duration-150 ease-out",
+            type === "text" ? "opacity-100" : "opacity-0",
+            isDisabled
+              ? "text-base-medium text-[var(--gb-text-static-gray)]"
+              : isActive
+                ? "text-base-semi-bold text-[var(--gb-text-bold)]"
+                : "text-base-medium text-[var(--gb-text-subtle)]",
+          )}
         >
-          <span className="min-w-0 overflow-hidden">
-            <span
-              className={cn(
-                "block truncate whitespace-nowrap transition-opacity duration-150 ease-out",
-                type === "text" ? "opacity-100" : "opacity-0",
-                isDisabled
-                  ? "text-base-medium text-[var(--gb-text-static-gray)]"
-                  : isActive
-                    ? "text-base-semi-bold text-[var(--gb-text-bold)]"
-                    : "text-base-medium text-[var(--gb-text-subtle)]",
-              )}
-            >
-              {label}
-            </span>
-          </span>
+          {label}
         </span>
       ) : null}
     </button>
