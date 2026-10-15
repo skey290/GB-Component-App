@@ -8,7 +8,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { NotiItem } from "@/components/app/noti-item";
 
 /**
- * GNB 알림벨(`MenuNotification`) 클릭 시 뜨는 드롭다운 패널. 헤더의
+ * GNB 알림벨(`MenuButton`) 클릭 시 뜨는 드롭다운 패널. 헤더의
  * All/Unread 탭과 카운트 배지는 `Tabs`/`Badge`를 그대로 재사용합니다.
  *
  * 항상 다크(GNB 계열 공통 — Chatbox/Popover와 동일한 패턴).

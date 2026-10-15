@@ -136,7 +136,7 @@ describe("Gnb", () => {
     expect(onSettingsClick).toHaveBeenCalledTimes(1);
   });
 
-  it("shows the notification dot only when unreadCount > 0", () => {
+  it("shows the dot-bell icon only when unreadCount > 0", () => {
     const { rerender } = render(
       <Gnb
         expanded={false}
@@ -145,9 +145,11 @@ describe("Gnb", () => {
         unreadCount={0}
       />,
     );
-    expect(
-      screen.getByTestId("menu-notification-icon"),
-    ).not.toHaveAttribute("data-dot");
+    const getNotificationUse = () =>
+      screen
+        .getByRole("button", { name: "Notification" })
+        .querySelector("use");
+    expect(getNotificationUse()).not.toBeInTheDocument();
 
     rerender(
       <Gnb
@@ -157,9 +159,9 @@ describe("Gnb", () => {
         unreadCount={3}
       />,
     );
-    expect(screen.getByTestId("menu-notification-icon")).toHaveAttribute(
-      "data-dot",
-      "true",
+    expect(getNotificationUse()).toHaveAttribute(
+      "href",
+      "/icons.svg#dot-bell-icon",
     );
   });
 
