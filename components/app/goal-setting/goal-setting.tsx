@@ -184,7 +184,7 @@ function renderParagraphTemplate(
           key={`chip-${chipIndex++}`}
           variant="default"
           size="20"
-          className="px-[var(--gb-spacing-4)] text-sm-medium align-middle"
+          className="align-middle"
         >
           {value}
         </Badge>
