@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { Megaphone, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Tabs } from "@/components/ui/tabs";
+import { NotiItem } from "@/components/app/noti-item";
 
 /**
  * GNB 알림벨(`MenuNotification`) 클릭 시 뜨는 드롭다운 패널. 헤더의
@@ -118,31 +119,7 @@ export function NotiDropdown({
         >
           {visibleItems.map((item) => (
             <li key={item.id} className="w-full shrink-0">
-              <div
-                className={cn(
-                  "flex h-[var(--gb-spacing-8)] w-full items-center gap-[var(--gb-spacing-3)]",
-                  "rounded-[var(--gb-radius-scale-sm)] px-[var(--gb-spacing-2)]",
-                  "text-[var(--gb-text-default)] transition-colors",
-                  "hover:bg-[var(--gb-background-mute)] hover:text-[var(--gb-text-static-white)]",
-                )}
-              >
-                <Megaphone
-                  aria-hidden="true"
-                  className="size-[var(--gb-spacing-3)] shrink-0"
-                />
-                <span className="min-w-0 flex-1 truncate text-xs-regular">
-                  {item.label}
-                </span>
-                {item.unread ? (
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "size-[var(--gb-spacing-1)] shrink-0 rounded-[var(--gb-radius-scale-full)]",
-                      "bg-[var(--gb-background-warning-default)]",
-                    )}
-                  />
-                ) : null}
-              </div>
+              <NotiItem label={item.label} unread={item.unread} />
             </li>
           ))}
         </ul>

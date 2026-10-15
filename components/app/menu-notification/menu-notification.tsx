@@ -4,12 +4,17 @@ import * as React from "react";
 import { Bell } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { createSpriteIcon } from "@/lib/sprite-icon";
+
+/** Figma `dot-bell-icon` — 벨+읽지 않음 점이 하나로 합쳐진 단일 에셋 */
+const DotBellIcon = createSpriteIcon("dot-bell-icon");
 
 /**
  * GNB의 알림벨 트리거. `type`은 icon/text, `status`는 default/active/disabled.
  *
- * default/active 상태에는 우측 상단에 4px 빨간 dot(`--background-warning-default`)이
- * 표시되고, disabled에는 표시되지 않습니다(`showDot`으로도 개별 제어 가능).
+ * 읽지 않음 표시가 있을 때는 Figma 원본과 동일하게 벨+점이 하나로 합쳐진
+ * `dot-bell-icon` 에셋을 쓰고, 없을 때(Figma엔 없는 상태)는 순수 `Bell` 아이콘을
+ * 씁니다 — `showDot`으로 개별 제어 가능하고, disabled에는 항상 숨겨집니다.
  *
  * GNB Expand 토글 시 라벨이 트랜지션 없이 팝인/팝아웃하던 문제를
  * MenuButton과 동일한 grid-template-columns 트릭으로 해결 — 상세 사유는
@@ -71,28 +76,34 @@ export const MenuNotification = React.forwardRef<
           isActive && "bg-[var(--gb-background-mute)]",
         )}
       >
-        <Bell
-          aria-hidden="true"
-          className={cn(
-            "size-[var(--gb-spacing-4)]",
-            isDisabled
-              ? "text-[var(--gb-icon-static-gray)]"
-              : isActive
-                ? "text-[var(--gb-icon-static-white)]"
-                : "text-[var(--gb-icon-subtle)]",
-          )}
-        />
         {displayDot ? (
-          <span
+          <DotBellIcon
             aria-hidden="true"
-            data-testid="menu-notification-dot"
+            data-testid="menu-notification-icon"
+            data-dot="true"
             className={cn(
-              "absolute top-[var(--gb-spacing-2-5)] right-[var(--gb-spacing-2-5)]",
-              "size-[var(--gb-spacing-1)] rounded-[var(--gb-radius-scale-full)]",
-              "bg-[var(--gb-background-warning-default)]",
+              "size-[var(--gb-spacing-4)]",
+              isDisabled
+                ? "text-[var(--gb-icon-static-gray)]"
+                : isActive
+                  ? "text-[var(--gb-icon-static-white)]"
+                  : "text-[var(--gb-icon-subtle)]",
             )}
           />
-        ) : null}
+        ) : (
+          <Bell
+            aria-hidden="true"
+            data-testid="menu-notification-icon"
+            className={cn(
+              "size-[var(--gb-spacing-4)]",
+              isDisabled
+                ? "text-[var(--gb-icon-static-gray)]"
+                : isActive
+                  ? "text-[var(--gb-icon-static-white)]"
+                  : "text-[var(--gb-icon-subtle)]",
+            )}
+          />
+        )}
       </span>
       {/* GNB Expand 토글 시 type이 icon ↔ text로 바뀌는데, 라벨을 조건부 렌더하면
           트랜지션이 불가능해 항상 마운트해두고 grid-template-columns(0fr↔1fr)로
@@ -100,13 +111,13 @@ export const MenuNotification = React.forwardRef<
       {label ? (
         <span
           aria-hidden={type === "text" ? undefined : "true"}
-          className="grid transition-[grid-template-columns] duration-200 ease-linear"
+          className="grid transition-[grid-template-columns] duration-200 ease-out"
           style={{ gridTemplateColumns: type === "text" ? "1fr" : "0fr" }}
         >
           <span className="min-w-0 overflow-hidden">
             <span
               className={cn(
-                "block truncate whitespace-nowrap transition-opacity duration-200 ease-linear",
+                "block truncate whitespace-nowrap transition-opacity duration-150 ease-out",
                 type === "text" ? "opacity-100" : "opacity-0",
                 isDisabled
                   ? "text-base-medium text-[var(--gb-text-static-gray)]"

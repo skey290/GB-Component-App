@@ -13,8 +13,6 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "bg-[var(--gb-background-bold)] text-[var(--gb-text-invert)]",
-        // border가 아니라 inset box-shadow — 레이아웃 공간을 차지하지 않아야
-        // 다른 variant와 높이가 어긋나지 않는다.
         reverse:
           "bg-[var(--gb-background-default)] text-[var(--gb-text-default)] shadow-[inset_0_0_0_var(--gb-border-1)_var(--gb-border-bolder)]",
         outline:

@@ -1,19 +1,18 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Blocks, Home, UserSearch } from "lucide-react";
+import { Blocks, Compass, Home, UserSearch } from "lucide-react";
 
 import { Gnb, type GnbItem } from "./gnb";
 import { createSpriteIcon } from "@/lib/sprite-icon";
 
 // gnb.stories.tsx와 동일한 아이콘 구성(Figma 실측 기준)을 사용해 데모 데이터를 일치시킨다.
 const AssetIcon = createSpriteIcon("asset-icon");
-const CompassIcon = createSpriteIcon("compass-icon");
 
 const items: GnbItem[] = [
   { id: "dashboard", icon: Home, label: "Dashboard" },
   { id: "assets", icon: AssetIcon, label: "Assets" },
-  { id: "compass", icon: CompassIcon, label: "Compass" },
+  { id: "compass", icon: Compass, label: "Compass" },
   { id: "contents-studio", icon: Blocks, label: "Contents Studio" },
   { id: "know-thyself", icon: UserSearch, label: "Know Thyself" },
 ];
@@ -147,8 +146,8 @@ describe("Gnb", () => {
       />,
     );
     expect(
-      screen.queryByTestId("menu-notification-dot"),
-    ).not.toBeInTheDocument();
+      screen.getByTestId("menu-notification-icon"),
+    ).not.toHaveAttribute("data-dot");
 
     rerender(
       <Gnb
@@ -158,7 +157,10 @@ describe("Gnb", () => {
         unreadCount={3}
       />,
     );
-    expect(screen.getByTestId("menu-notification-dot")).toBeInTheDocument();
+    expect(screen.getByTestId("menu-notification-icon")).toHaveAttribute(
+      "data-dot",
+      "true",
+    );
   });
 
   it("opens the notification dropdown when the bell is clicked and calls onToggleNotification", async () => {

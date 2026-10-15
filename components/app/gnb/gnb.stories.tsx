@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs";
-import { Blocks, Home, UserSearch } from "lucide-react";
+import { Blocks, Compass, Home, UserSearch } from "lucide-react";
 import { fn } from "storybook/test";
 
 import { Gnb, type GnbItem, type GnbProps } from "./gnb";
@@ -8,16 +8,15 @@ import { createSpriteIcon } from "@/lib/sprite-icon";
 import type { NotiDropdownItem } from "@/components/app/noti-dropdown";
 
 const FIGMA_URL =
-  "https://www.figma.com/design/G9YNa2vjdqDjnML9y5hXJ4/%F0%9F%93%8C-GB_Design-System--Atom-?node-id=616-3399";
+  "https://www.figma.com/design/Wp6AZNGqC4qf2Sz5zQ2PzQ/%F0%9F%93%8C-GB_UXUI--261002-?node-id=8163-93080";
 
-// Assets/Compass는 /public/icons.svg 커스텀 벡터, 나머지는 lucide 표준 아이콘.
+// Assets는 /public/icons.svg 커스텀 벡터, 나머지는 lucide 표준 아이콘.
 const AssetIcon = createSpriteIcon("asset-icon");
-const CompassIcon = createSpriteIcon("compass-icon");
 
 const items: GnbItem[] = [
   { id: "dashboard", icon: Home, label: "Dashboard" },
   { id: "assets", icon: AssetIcon, label: "Assets" },
-  { id: "compass", icon: CompassIcon, label: "Compass" },
+  { id: "compass", icon: Compass, label: "Compass" },
   { id: "contents-studio", icon: Blocks, label: "Contents Studio" },
   { id: "know-thyself", icon: UserSearch, label: "Know Thyself" },
 ];

@@ -17,26 +17,32 @@ describe("MenuNotification", () => {
     expect(screen.getByText("Notification")).toBeInTheDocument();
   });
 
-  it("shows the unread dot by default for default/active status", () => {
+  it("shows the dot-bell icon by default for default/active status", () => {
     const { rerender } = render(<MenuNotification status="default" />);
-    expect(screen.getByTestId("menu-notification-dot")).toBeInTheDocument();
+    expect(screen.getByTestId("menu-notification-icon")).toHaveAttribute(
+      "data-dot",
+      "true",
+    );
 
     rerender(<MenuNotification status="active" />);
-    expect(screen.getByTestId("menu-notification-dot")).toBeInTheDocument();
+    expect(screen.getByTestId("menu-notification-icon")).toHaveAttribute(
+      "data-dot",
+      "true",
+    );
   });
 
-  it("hides the unread dot when status='disabled'", () => {
+  it("falls back to the plain bell icon when status='disabled'", () => {
     render(<MenuNotification status="disabled" />);
     expect(
-      screen.queryByTestId("menu-notification-dot"),
-    ).not.toBeInTheDocument();
+      screen.getByTestId("menu-notification-icon"),
+    ).not.toHaveAttribute("data-dot");
   });
 
-  it("hides the unread dot when showDot=false regardless of status", () => {
+  it("falls back to the plain bell icon when showDot=false regardless of status", () => {
     render(<MenuNotification status="default" showDot={false} />);
     expect(
-      screen.queryByTestId("menu-notification-dot"),
-    ).not.toBeInTheDocument();
+      screen.getByTestId("menu-notification-icon"),
+    ).not.toHaveAttribute("data-dot");
   });
 
   it("marks status='active' with aria-current", () => {

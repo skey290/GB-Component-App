@@ -91,9 +91,12 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
         {showIcon ? (
           <span
             className={cn(
-              "inline-flex shrink-0 items-center justify-center transition-colors",
-              "size-[var(--gb-spacing-8)] rounded-[var(--gb-radius-scale-md)]",
-              showActiveStyle && "bg-[var(--gb-background-mute)]",
+              "inline-flex shrink-0 items-center justify-center",
+              "transition-[background-color,border-radius] duration-150",
+              "size-[var(--gb-spacing-8)]",
+              showActiveStyle
+                ? "rounded-[var(--gb-radius-scale-lg)] bg-[var(--gb-background-mute)]"
+                : "rounded-[var(--gb-radius-scale-full)]",
             )}
           >
             <Icon
@@ -119,7 +122,7 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
           // 조건부 렌더로는 CSS 트랜지션이 걸리지 않는다.
           <span
             aria-hidden={isExpanded ? undefined : "true"}
-            className="grid transition-[grid-template-columns,padding-left] duration-200 ease-linear"
+            className="grid transition-[grid-template-columns,padding-left] duration-200 ease-out"
             style={{
               gridTemplateColumns: isExpanded ? "1fr" : "0fr",
               paddingLeft: isExpanded ? "var(--gb-spacing-3)" : "0px",
@@ -128,7 +131,7 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
             <span className="min-w-0 overflow-hidden">
               <span
                 className={cn(
-                  "block truncate whitespace-nowrap transition-opacity duration-200 ease-linear",
+                  "block truncate whitespace-nowrap transition-opacity duration-150 ease-out",
                   isExpanded ? "opacity-100" : "opacity-0",
                   labelTextClass,
                 )}

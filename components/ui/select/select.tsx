@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ChevronUp,
   Plus,
+  type LucideIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -21,6 +22,10 @@ export interface SelectOption {
   label: string;
   /** 트리거에 라벨 대신 표시할 짧은 코드 (예: 국가번호 "+82") */
   code?: string;
+  /** 리스트 아이템 왼쪽에 표시할 아이콘 (Figma `Part/dropdown slot` leadingIcon) */
+  icon?: LucideIcon;
+  /** 이 옵션만 선택 불가 (Figma `Part/dropdown slot` status=disabled) */
+  disabled?: boolean;
 }
 
 export interface SelectProps {
@@ -106,9 +111,6 @@ export function Select({
     setThumb({ top: topPercent, height: heightPercent });
   }, []);
 
-  // Radix Popover는 Portal + Presence로 렌더링되어, `open`이 true가 되는 렌더와
-  // <ul>가 실제 DOM에 마운트되는 시점이 같은 커밋이 아닐 수 있음 — 콜백 ref로
-  // 노드가 실제로 붙는 순간에 맞춰 계산한다.
   const listCallbackRef = React.useCallback(
     (node: HTMLUListElement | null) => {
       listRef.current = node;
@@ -132,6 +134,7 @@ export function Select({
   const isSideReverse = variant === "side-reverse";
   const isReverse = variant === "reverse";
   const hasCodeColumn = options.some((option) => option.code);
+  const hasLeadingIcon = options.some((option) => option.icon);
 
   const triggerLabel =
     selectedOption?.code ?? selectedOption?.label ?? placeholder;
@@ -152,6 +155,7 @@ export function Select({
   };
 
   const commitSelection = (option: SelectOption) => {
+    if (option.disabled) return;
     if (!isControlled) setUncontrolledValue(option.value);
     onValueChange?.(option.value);
     setOpen(false);
@@ -161,7 +165,6 @@ export function Select({
     event: React.KeyboardEvent<HTMLButtonElement>,
   ) => {
     if (disabled || open) return;
-    // Enter/Space는 <button>의 기본 클릭 동작으로 이미 팝오버가 열리므로 화살표 키만 처리
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       handleOpenChange(true);
@@ -324,6 +327,7 @@ export function Select({
               {options.map((option, index) => {
                 const isSelected = option.value === value;
                 const isHighlighted = highlightedIndex === index;
+                const isOptionDisabled = Boolean(option.disabled);
 
                 return (
                   <li
@@ -331,25 +335,45 @@ export function Select({
                     id={getOptionId(option.value)}
                     role="option"
                     aria-selected={isSelected}
-                    onMouseEnter={() => setHighlightedIndex(index)}
+                    aria-disabled={isOptionDisabled || undefined}
+                    onMouseEnter={() => {
+                      if (!isOptionDisabled) setHighlightedIndex(index);
+                    }}
                     onClick={() => commitSelection(option)}
                     className={cn(
-                      "flex w-full shrink-0 cursor-pointer items-center",
+                      "flex w-full shrink-0 items-center",
                       "gap-[var(--gb-spacing-1)]",
                       "h-[var(--gb-spacing-8)] px-[var(--gb-spacing-2)]",
                       "rounded-[var(--gb-radius-scale-sm)]",
                       "text-sm-regular",
-                      isSelected || isHighlighted
-                        ? "bg-[var(--gb-background-mute)] text-[var(--gb-text-static-white)]"
+                      isOptionDisabled
+                        ? "cursor-not-allowed text-[var(--gb-text-static-gray)]"
                         : cn(
-                            "text-[var(--gb-text-default)]",
-                            "hover:bg-[var(--gb-background-mute)] hover:text-[var(--gb-text-static-white)]",
+                            "cursor-pointer",
+                            isSelected || isHighlighted
+                              ? "bg-[var(--gb-background-mute)] text-[var(--gb-text-static-white)]"
+                              : cn(
+                                  "text-[var(--gb-text-default)]",
+                                  "hover:bg-[var(--gb-background-mute)] hover:text-[var(--gb-text-static-white)]",
+                                ),
                           ),
                     )}
                   >
+                    {hasLeadingIcon ? (
+                      option.icon ? (
+                        <option.icon
+                          aria-hidden="true"
+                          className="size-[var(--gb-spacing-4)] shrink-0"
+                        />
+                      ) : (
+                        <span
+                          aria-hidden="true"
+                          className="size-[var(--gb-spacing-4)] shrink-0"
+                        />
+                      )
+                    ) : null}
                     {hasCodeColumn ? (
                       <>
-                        {/* Figma 확정값: 코드 컬럼 고정폭 50px */}
                         <span className="w-[50px] shrink-0">{option.code}</span>
                         <span className="min-w-0 flex-1 truncate">
                           {option.label}
