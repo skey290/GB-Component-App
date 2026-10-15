@@ -361,7 +361,7 @@ export function Gnb({
       <Toggle
         type="icon"
         selectionMode="multiple"
-        className="absolute top-[20px] z-20 transition-[left] duration-200 ease-linear"
+        className="absolute top-[20px] z-20"
         style={{ left: `${toggleLeft}px` }}
         items={[
           {
