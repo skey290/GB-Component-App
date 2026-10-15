@@ -93,8 +93,7 @@ export const MenuButton = React.forwardRef<HTMLButtonElement, MenuButtonProps>(
         {showIcon ? (
           <span
             className={cn(
-              "inline-flex shrink-0 items-center justify-center",
-              "transition-[background-color,border-radius] duration-150",
+              "inline-flex shrink-0 items-center justify-center transition-colors",
               "size-[var(--gb-spacing-8)]",
               showActiveStyle
                 ? "rounded-[var(--gb-radius-scale-lg)] bg-[var(--gb-background-mute)]"
