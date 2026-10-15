@@ -151,9 +151,10 @@ export function FloatingProfile({
         }
         className={cn(
           "relative z-[2] inline-flex shrink-0 items-center justify-center rounded-[var(--gb-radius-scale-full)] bg-transparent p-0 outline-none disabled:cursor-default",
-          open
-            ? "border-[length:var(--gb-border-1)] border-[var(--gb-border-bolder)]"
-            : "border-0",
+          // 실제 border는 레이아웃 공간을 차지해서 켜고 끌 때마다 아바타
+          // 이미지가 1px씩 밀려 보인다 — box-shadow로 바깥쪽에 겹쳐 그려서
+          // 레이아웃에 영향 없이 링만 토글한다.
+          open && "shadow-[0_0_0_var(--gb-border-1)_var(--gb-border-bolder)]",
         )}
       >
         <Avatar

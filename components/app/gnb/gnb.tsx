@@ -20,6 +20,7 @@ import { createSpriteIcon } from "@/lib/sprite-icon";
 import { MenuButton } from "@/components/app/menu-button";
 import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
+import { Popover } from "@/components/ui/popover";
 import {
   NotiDropdown,
   type NotiDropdownItem,
@@ -38,8 +39,6 @@ export interface GnbHistoryItem {
   onRestore?: () => void;
   /** Self Archive 스타일 행에서만 사용(Work History에는 삭제 버튼이 없음) */
   onDelete?: () => void;
-  /** Self Archive 스타일 행에서만 사용 — 현재 선택된 항목 하이라이트(Figma 확정값) */
-  selected?: boolean;
 }
 
 const historyIconButtonClass = cn(
@@ -63,6 +62,16 @@ function GnbHistoryPanel({
   items: GnbHistoryItem[];
   onClose: () => void;
 }) {
+  // 삭제는 바로 지우지 않고 확인창을 먼저 띄운다 — Figma에는 이 확인창
+  // 디자인이 없지만(삭제 아이콘만 있음), 되돌릴 수 없는 삭제라 실수 방지
+  // 차원에서 둔다. 기존 범용 Popover(alert-dialog 기반 확인 모달)를 그대로
+  // 재사용한다.
+  const [pendingDeleteIndex, setPendingDeleteIndex] = React.useState<
+    number | null
+  >(null);
+  const pendingDeleteItem =
+    pendingDeleteIndex !== null ? items[pendingDeleteIndex] : null;
+
   return (
     <div
       className={cn(
@@ -123,7 +132,6 @@ function GnbHistoryPanel({
                   className={cn(
                     "flex h-[var(--gb-spacing-8)] w-full items-center gap-[var(--gb-spacing-1)]",
                     "rounded-[var(--gb-radius-scale-sm)] pr-[var(--gb-spacing-1)] pl-[var(--gb-spacing-2)]",
-                    item.selected && "bg-[var(--gb-background-selected)]",
                   )}
                 >
                   <span className="min-w-0 flex-1 truncate text-sm-regular text-[var(--gb-text-default)]">
@@ -146,7 +154,7 @@ function GnbHistoryPanel({
                     <button
                       type="button"
                       aria-label="Delete"
-                      onClick={item.onDelete}
+                      onClick={() => setPendingDeleteIndex(index)}
                       className={cn(historyIconButtonClass, "size-[28px]")}
                     >
                       <Trash2
@@ -161,6 +169,26 @@ function GnbHistoryPanel({
           );
         })}
       </ul>
+
+      <Popover
+        type="warning"
+        open={pendingDeleteIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteIndex(null);
+        }}
+        title="삭제할까요?"
+        description={
+          pendingDeleteItem
+            ? `"${pendingDeleteItem.label}"을(를) 삭제하면 되돌릴 수 없습니다.`
+            : undefined
+        }
+        confirmLabel="Delete"
+        onConfirm={() => {
+          pendingDeleteItem?.onDelete?.();
+          setPendingDeleteIndex(null);
+        }}
+        onCancel={() => setPendingDeleteIndex(null)}
+      />
     </div>
   );
 }
@@ -236,9 +264,13 @@ export function Gnb({
 
   // Figma 실측: 토글은 "현재 보이는 패널 전체 폭(레일 48/250px + 열려있으면 드로어
   // 407px) + 20px" 위치에 고정된다 — 레일-패널 사이는 0px(완전 플러시)이고, 20px
-  // 간격은 패널과 토글 사이의 것이다.
-  const railWidth = expanded ? 250 : 48;
-  const toggleLeft = railWidth + (activeDrawer ? 407 : 0) + 20;
+  // 간격은 패널과 토글 사이의 것이다. 레일 폭(expanded)과 드로어 폭(activeDrawer)
+  // 은 서로 다른 CSS 속성으로 나눠서 적용한다 — `left`(레일 폭 축)는 레일 자신의
+  // width 트랜지션과 같은 200ms로 함께 움직여야 레일이 다 접히기 전에 토글만
+  // 먼저 도착해버리는 어긋남이 안 생기고, `transform`(드로어 폭 축)은 드로어가
+  // 실제로 즉시 나타나고 사라지는 것과 맞춰 트랜지션 없이 바로 스냅한다.
+  const toggleLeft = (expanded ? 250 : 48) + 20;
+  const toggleDrawerOffset = activeDrawer ? 407 : 0;
 
   const toggleDrawer = (drawer: "work-history" | "self-archive") => {
     setActiveDrawer((prev) => (prev === drawer ? null : drawer));
@@ -353,16 +385,21 @@ export function Gnb({
       {/* Work History/Self Archive 트리거 — GNB 패널 바깥 우측에 독립적으로 떠
           있는 2연 세그먼트(`Toggle`). 메인 패널이 overflow-hidden이라 그 안에
           두면 패널 박스 밖으로 나온 부분이 잘려서, 바깥 래퍼 기준 절대위치로
-          둔다(left는 위에서 계산한 toggleLeft — 레일 폭 + 드로어가 열려있으면
-          패널 폭까지 더해 항상 현재 보이는 패널 바로 옆 20px에 붙는다). 둘 다
-          닫힘에서 시작, 누른 쪽만 열리고 같은 걸 다시 누르면 닫힌다(상호 배타 +
-          재클릭 닫기는 selectionMode로 표현이 안 돼 activeDrawer 상태로 직접
-          제어). */}
+          둔다. `left`(레일 폭 축)는 레일 자신의 width 트랜지션과 같은 200ms로
+          같이 움직이고, `transform`(드로어 폭 축)은 트랜지션 없이 즉시
+          스냅한다 — 서로 다른 CSS 속성으로 나눠야 레일이 다 접히기 전에
+          토글만 먼저 도착하는 어긋남 없이, 드로어는 여전히 즉시 나타난다.
+          둘 다 닫힘에서 시작, 누른 쪽만 열리고 같은 걸 다시 누르면 닫힌다
+          (상호 배타 + 재클릭 닫기는 selectionMode로 표현이 안 돼 activeDrawer
+          상태로 직접 제어). */}
       <Toggle
         type="icon"
         selectionMode="multiple"
-        className="absolute top-[20px] z-20"
-        style={{ left: `${toggleLeft}px` }}
+        className="absolute top-[20px] z-20 transition-[left] duration-200 ease-linear"
+        style={{
+          left: `${toggleLeft}px`,
+          transform: `translateX(${toggleDrawerOffset}px)`,
+        }}
         items={[
           {
             icon: <History aria-hidden="true" className="size-full" />,

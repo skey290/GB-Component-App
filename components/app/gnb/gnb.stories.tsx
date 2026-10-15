@@ -34,7 +34,7 @@ const workHistoryItems: GnbHistoryItem[] = [
 ];
 
 const selfArchiveItems: GnbHistoryItem[] = [
-  { label: "Morning Jogger", selected: true, onRestore: () => {}, onDelete: () => {} },
+  { label: "Morning Jogger", onRestore: () => {}, onDelete: () => {} },
   { label: "Weekend Chef", onRestore: () => {}, onDelete: () => {} },
 ];
 
