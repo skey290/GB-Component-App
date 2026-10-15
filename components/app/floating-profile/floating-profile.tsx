@@ -64,7 +64,7 @@ function PolaroidCorner({ className }: { className?: string }) {
       aria-hidden="true"
       viewBox="0 0 51 51"
       className={cn(
-        "absolute size-[50px] text-[var(--gb-color-neutral-50)]",
+        "pointer-events-none absolute size-[50px] text-[var(--gb-color-neutral-50)]",
         className,
       )}
     >

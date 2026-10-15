@@ -6,6 +6,7 @@ import { fn } from "storybook/test";
 import { Gnb, type GnbItem, type GnbProps } from "./gnb";
 import { createSpriteIcon } from "@/lib/sprite-icon";
 import type { NotiDropdownItem } from "@/components/app/noti-dropdown";
+import type { GnbHistoryItem } from "./gnb";
 
 const FIGMA_URL =
   "https://www.figma.com/design/Wp6AZNGqC4qf2Sz5zQ2PzQ/%F0%9F%93%8C-GB_UXUI--261002-?node-id=8163-93080";
@@ -25,6 +26,16 @@ const notificationItems: NotiDropdownItem[] = [
   { id: "1", label: "notification placeholder", unread: true },
   { id: "2", label: "notification placeholder", unread: true },
   { id: "3", label: "notification placeholder" },
+];
+
+const workHistoryItems: GnbHistoryItem[] = [
+  { label: "Profile photo", badge: "Data Scientist", timestamp: "Just now", onRestore: () => {} },
+  { label: "Bio", badge: "Data Scientist", timestamp: "20min ago", onRestore: () => {} },
+];
+
+const selfArchiveItems: GnbHistoryItem[] = [
+  { label: "Morning Jogger", selected: true, onRestore: () => {}, onDelete: () => {} },
+  { label: "Weekend Chef", onRestore: () => {}, onDelete: () => {} },
 ];
 
 function ControlledGnb(props: GnbProps) {
@@ -76,6 +87,8 @@ const meta = {
     disabledIds: [],
     unreadCount: 2,
     notificationItems,
+    workHistoryItems,
+    selfArchiveItems,
     onItemSelect: fn(),
     onExpandedChange: fn(),
     onSettingsClick: fn(),
