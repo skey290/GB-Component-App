@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Minus, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -62,11 +61,17 @@ export interface GoalSettingFilledProps extends GoalSettingSharedProps {
    * 삽입됩니다.
    */
   paragraph2Template: string;
-  brandPosition: string;
+  /** 제어 컴포넌트로 사용할 때의 Brand Position 값 */
+  brandPosition?: string;
+  /** 비제어 컴포넌트로 사용할 때의 초기 Brand Position 값 */
+  defaultBrandPosition?: string;
   onBrandPositionChange?: (value: string) => void;
   brandPositionFile?: File | null;
   onBrandPositionFileChange?: (file: File | null) => void;
-  target: string;
+  /** 제어 컴포넌트로 사용할 때의 Target 값 */
+  target?: string;
+  /** 비제어 컴포넌트로 사용할 때의 초기 Target 값 */
+  defaultTarget?: string;
   onTargetChange?: (value: string) => void;
   targetFile?: File | null;
   onTargetFileChange?: (file: File | null) => void;
@@ -130,27 +135,25 @@ function FrequencyGroup<T extends string>({
     <div
       role="group"
       aria-label={label}
-      className="flex items-center gap-[var(--gb-spacing-2)]"
+      className="flex w-full items-center gap-[var(--gb-spacing-2)]"
     >
       {options.map((option) => {
         const isSelected = option === value;
         return (
-          <button
+          <Button
             key={option}
             type="button"
+            variant="outline"
             aria-pressed={isSelected}
             onClick={() => onChange?.(option)}
             className={cn(
-              "h-[36px] rounded-[var(--gb-radius-scale-lg)] px-[var(--gb-spacing-4)]",
-              "text-sm-medium transition-colors",
-              "border-[length:var(--gb-border-1)] border-solid",
-              isSelected
-                ? "border-transparent bg-[var(--gb-background-mute)] text-[var(--gb-text-static-white)]"
-                : "border-[var(--gb-border-default)] bg-[var(--gb-background-default)] text-[var(--gb-text-default)]",
+              "flex-1",
+              isSelected &&
+                "border-transparent bg-[var(--gb-background-mute)] text-[var(--gb-text-static-white)]",
             )}
           >
             {option}
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -176,7 +179,11 @@ function renderParagraphTemplate(
     const value = values[key];
     nodes.push(
       value !== undefined ? (
-        <Chips key={`chip-${chipIndex++}`} variant="primary">
+        <Chips
+          key={`chip-${chipIndex++}`}
+          variant="primary"
+          className="h-[20px]"
+        >
           {value}
         </Chips>
       ) : (
@@ -234,10 +241,12 @@ function GoalSettingFilledView({
   paragraph1Template,
   paragraph2Template,
   brandPosition,
+  defaultBrandPosition = "",
   onBrandPositionChange,
   brandPositionFile = null,
   onBrandPositionFileChange,
   target,
+  defaultTarget = "",
   onTargetChange,
   targetFile = null,
   onTargetFileChange,
@@ -256,6 +265,22 @@ function GoalSettingFilledView({
   onSave,
   className,
 }: GoalSettingFilledProps) {
+  const [uncontrolledBrandPosition, setUncontrolledBrandPosition] =
+    React.useState(defaultBrandPosition);
+  const currentBrandPosition = brandPosition ?? uncontrolledBrandPosition;
+  const handleBrandPositionChange = (value: string) => {
+    if (brandPosition === undefined) setUncontrolledBrandPosition(value);
+    onBrandPositionChange?.(value);
+  };
+
+  const [uncontrolledTarget, setUncontrolledTarget] =
+    React.useState(defaultTarget);
+  const currentTarget = target ?? uncontrolledTarget;
+  const handleTargetChange = (value: string) => {
+    if (target === undefined) setUncontrolledTarget(value);
+    onTargetChange?.(value);
+  };
+
   const [uncontrolledPostingFrequency, setUncontrolledPostingFrequency] =
     React.useState(defaultPostingFrequency);
   const currentPostingFrequency = postingFrequency ?? uncontrolledPostingFrequency;
@@ -305,8 +330,8 @@ function GoalSettingFilledView({
       <div className="flex w-full flex-col gap-[var(--gb-spacing-4)]">
         <p className="text-base-regular text-[var(--gb-text-default)]">
           {renderParagraphTemplate(paragraph1Template, {
-            brandPosition,
-            target,
+            brandPosition: currentBrandPosition,
+            target: currentTarget,
           })}
         </p>
         <p className="text-base-regular text-[var(--gb-text-default)]">
@@ -326,8 +351,8 @@ function GoalSettingFilledView({
           description=""
           showSelect={false}
           showLink={false}
-          textfieldValue={brandPosition}
-          onTextfieldValueChange={onBrandPositionChange}
+          textfieldValue={currentBrandPosition}
+          onTextfieldValueChange={handleBrandPositionChange}
           file={brandPositionFile}
           onFileChange={onBrandPositionFileChange}
           uploadPlaceholder="File.pdf"
@@ -338,8 +363,8 @@ function GoalSettingFilledView({
           description=""
           showSelect={false}
           showLink={false}
-          textfieldValue={target}
-          onTextfieldValueChange={onTargetChange}
+          textfieldValue={currentTarget}
+          onTextfieldValueChange={handleTargetChange}
           file={targetFile}
           onFileChange={onTargetFileChange}
           uploadPlaceholder="File.pdf"
@@ -349,7 +374,7 @@ function GoalSettingFilledView({
 
       <div className="flex w-full flex-col gap-[var(--gb-spacing-3)]">
         <SectionLabel>Posting Frequency</SectionLabel>
-        <div className="flex items-center gap-[var(--gb-spacing-4)]">
+        <div className="flex w-full flex-col gap-[var(--gb-spacing-3)]">
           <FrequencyGroup
             label="Posting Frequency"
             options={POSTING_FREQUENCIES}
@@ -357,41 +382,27 @@ function GoalSettingFilledView({
             onChange={handlePostingFrequencyChange}
           />
           <div className="flex items-center gap-[var(--gb-spacing-2)]">
-            <button
+            <Button
               type="button"
+              variant="icon-rounded"
+              icon="minus-icon"
               aria-label="감소"
               onClick={() =>
                 handlePostingCountChange(Math.max(1, currentPostingCount - 1))
               }
-              className={cn(
-                "flex size-[24px] shrink-0 items-center justify-center",
-                "rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-default)]",
-                "text-[var(--gb-icon-default)]",
-              )}
-            >
-              <Minus
-                className="size-[var(--gb-spacing-3)]"
-                aria-hidden="true"
-              />
-            </button>
+              className="size-[24px]"
+            />
             <span className="text-xs-medium text-[var(--gb-text-default)]">
               {currentPostingCount} time(s) a day
             </span>
-            <button
+            <Button
               type="button"
+              variant="icon-rounded"
+              icon="plus-icon"
               aria-label="증가"
               onClick={() => handlePostingCountChange(currentPostingCount + 1)}
-              className={cn(
-                "flex size-[24px] shrink-0 items-center justify-center",
-                "rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-default)]",
-                "text-[var(--gb-icon-default)]",
-              )}
-            >
-              <Plus
-                className="size-[var(--gb-spacing-3)]"
-                aria-hidden="true"
-              />
-            </button>
+              className="size-[24px]"
+            />
           </div>
         </div>
       </div>
@@ -407,11 +418,14 @@ function GoalSettingFilledView({
           aria-label="Targeted Followers"
           className="w-full"
         />
-        <div className="flex w-full items-center justify-between">
-          {TARGETED_FOLLOWERS_LABELS.map((label) => (
+        <div className="relative h-[var(--gb-spacing-4)] w-full">
+          {TARGETED_FOLLOWERS_LABELS.map((label, index) => (
             <span
               key={label}
-              className="text-xs-regular text-[var(--gb-text-subtle)]"
+              style={{
+                left: `${(index / (TARGETED_FOLLOWERS_LABELS.length - 1)) * 100}%`,
+              }}
+              className="text-xs-regular absolute -translate-x-1/2 whitespace-nowrap text-[var(--gb-text-subtle)]"
             >
               {label}
             </span>

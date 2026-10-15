@@ -46,8 +46,8 @@ const meta = {
       "I'm a data scientist who translates statistical rigor into numbers finance teams actually trust, positioned as a {brandPosition} for {target} who need revenue forecasts investors and finance leads can act on.",
     paragraph2Template:
       "I share {postingSummary} actionable insights and case studies with approximately {targetedFollowers} targeted followers, maintaining consistent {trackingFrequency} reach and engagement that reflects genuine interest in helping SaaS companies reach seven-figure ARR.",
-    brandPosition: "Finance-Fluent Modeling Partner",
-    target: "early-stage SaaS founders",
+    defaultBrandPosition: "Finance-Fluent Modeling Partner",
+    defaultTarget: "early-stage SaaS founders",
     defaultPostingFrequency: "Daily",
     defaultPostingCount: 3,
     defaultTargetedFollowersIndex: 1,
