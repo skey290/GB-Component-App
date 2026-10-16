@@ -7,12 +7,7 @@ import { cn } from "@/lib/utils";
 import { Tabs } from "@/components/ui/tabs";
 import { NotiItem } from "@/components/app/noti-item";
 
-/**
- * GNB 알림벨(`MenuButton`) 클릭 시 뜨는 드롭다운 패널. 헤더의
- * All/Unread 탭과 카운트 배지는 `Tabs`/`Badge`를 그대로 재사용합니다.
- *
- * 항상 다크(GNB 계열 공통 — Chatbox/Popover와 동일한 패턴).
- */
+/** 알림벨 클릭 시 뜨는 드롭다운 패널 (docs/components/noti-dropdown.md 참고) */
 export interface NotiDropdownItem {
   id: string;
   label: string;
@@ -26,18 +21,20 @@ export interface NotiDropdownProps {
   selectedTab?: "all" | "unread";
   onSelectedTabChange?: (tab: "all" | "unread") => void;
   onSettingsClick?: () => void;
+  /** 리스트 안 알림 항목 클릭 시 호출(항목 id 전달) */
+  onItemClick?: (id: string) => void;
   className?: string;
 }
-const LIST_MAX_HEIGHT_CLASS =
-  "max-h-[calc((var(--gb-spacing-8)*6)+(var(--gb-spacing-2)*5)+(var(--gb-spacing-1)*2))]";
-const SCROLLBAR_TRACK_HEIGHT_CLASS =
-  "h-[calc((var(--gb-spacing-8)*6)+(var(--gb-spacing-2)*5)+(var(--gb-spacing-1)*2))]";
+// 6행 높이로 고정 (docs/components/noti-dropdown.md 참고 — calc() 공백 필수)
+const LIST_VISIBLE_HEIGHT =
+  "calc((var(--gb-spacing-8) * 6) + (var(--gb-spacing-2) * 5) + (var(--gb-spacing-1) * 2))";
 
 export function NotiDropdown({
   items,
   selectedTab = "all",
   onSelectedTabChange,
   onSettingsClick,
+  onItemClick,
   className,
 }: NotiDropdownProps) {
   const [thumb, setThumb] = React.useState({ top: 0, height: 100 });
@@ -111,15 +108,19 @@ export function NotiDropdown({
         <ul
           ref={listCallbackRef}
           onScroll={updateThumb}
+          style={{ maxHeight: LIST_VISIBLE_HEIGHT }}
           className={cn(
             "flex min-w-0 flex-1 flex-col items-start gap-[var(--gb-spacing-2)] overflow-y-auto p-[var(--gb-spacing-1)]",
             "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-            LIST_MAX_HEIGHT_CLASS,
           )}
         >
           {visibleItems.map((item) => (
             <li key={item.id} className="w-full shrink-0">
-              <NotiItem label={item.label} unread={item.unread} />
+              <NotiItem
+                label={item.label}
+                unread={item.unread}
+                onClick={() => onItemClick?.(item.id)}
+              />
             </li>
           ))}
         </ul>
@@ -129,10 +130,8 @@ export function NotiDropdown({
             className="shrink-0 py-[var(--gb-spacing-1)] pr-[var(--gb-spacing-1)]"
           >
             <div
-              className={cn(
-                "relative w-[10px] rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-subtler)]",
-                SCROLLBAR_TRACK_HEIGHT_CLASS,
-              )}
+              style={{ height: LIST_VISIBLE_HEIGHT }}
+              className="relative w-[10px] rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-subtler)]"
             >
               <div
                 className="absolute inset-x-0 rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-subtle)]"

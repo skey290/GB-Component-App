@@ -57,9 +57,9 @@ export interface GoalSettingFilledProps extends GoalSettingSharedProps {
   paragraph1Template: string;
   /**
    * 자기소개 2문단 서술 텍스트. `{postingSummary}`(Posting Frequency/카운터
-   * 기반 "3 time(s) a day"), `{targetedFollowers}`(Targeted Followers
-   * 슬라이더 값), `{trackingFrequency}` 자리에 해당 값이 Badge로 자동
-   * 삽입됩니다.
+   * 기반 "3 time(s) a day (Daily)"), `{targetedFollowers}`(Targeted
+   * Followers 슬라이더 값), `{trackingFrequency}` 자리에 해당 값이 Badge로
+   * 자동 삽입됩니다.
    */
   paragraph2Template: string;
   /** 제어 컴포넌트로 사용할 때의 Brand Position 값 */
@@ -282,7 +282,8 @@ function GoalSettingFilledView({
 
   const [uncontrolledPostingFrequency, setUncontrolledPostingFrequency] =
     React.useState(defaultPostingFrequency);
-  const currentPostingFrequency = postingFrequency ?? uncontrolledPostingFrequency;
+  const currentPostingFrequency =
+    postingFrequency ?? uncontrolledPostingFrequency ?? "Daily";
   const handlePostingFrequencyChange = (value: GoalSettingPostingFrequency) => {
     if (postingFrequency === undefined) setUncontrolledPostingFrequency(value);
     onPostingFrequencyChange?.(value);
@@ -319,7 +320,7 @@ function GoalSettingFilledView({
   const targetedFollowers =
     TARGETED_FOLLOWERS_LABELS[currentTargetedFollowersIndex] ??
     TARGETED_FOLLOWERS_LABELS[0];
-  const postingSummary = `${currentPostingCount} time${currentPostingCount === 1 ? "" : "s"} a day`;
+  const postingSummary = `${currentPostingCount} time${currentPostingCount === 1 ? "" : "s"} a day (${currentPostingFrequency})`;
 
   return (
     <div className={cn(ROOT_CLASS, "gap-[var(--gb-spacing-7)]", className)}>

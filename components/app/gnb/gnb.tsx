@@ -5,10 +5,14 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import {
   type LucideIcon,
   Archive,
+  BarChartBig,
   Bell,
+  CreditCard,
   History,
   RotateCcw,
+  Shield,
   Trash2,
+  UserRound,
   X,
   PanelLeftClose as PanelLeftCloseIcon,
   PanelLeftOpen as PanelLeftOpenIcon,
@@ -16,18 +20,33 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { createSpriteIcon } from "@/lib/sprite-icon";
 import { MenuButton } from "@/components/app/menu-button";
 import { Toggle } from "@/components/ui/toggle";
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
+import { InputSearch } from "@/components/ui/input-search";
 import {
   NotiDropdown,
   type NotiDropdownItem,
 } from "@/components/app/noti-dropdown";
 
-/** Figma `dot-bell-icon` — 벨+읽지 않음 점이 하나로 합쳐진 단일 에셋 */
-const DotBellIcon = createSpriteIcon("dot-bell-icon");
+/** 읽지 않은 알림 벨 — `Bell` 위에 점을 겹친 합성 아이콘 (docs/components/gnb.md 참고) */
+const DotBellIcon = (function DotBellIcon({
+  className,
+}: {
+  className?: string;
+}) {
+  return (
+    <span className={cn("relative inline-flex", className)}>
+      <Bell aria-hidden="true" className="size-full" />
+      <span
+        aria-hidden="true"
+        data-testid="unread-dot"
+        className="absolute -top-0.5 -right-0.5 size-[var(--gb-spacing-1)] rounded-[var(--gb-radius-scale-full)] bg-[var(--gb-background-warning-default)]"
+      />
+    </span>
+  );
+}) as unknown as LucideIcon;
 
 /** Work History/Self Archive 드로어 리스트 항목 하나 */
 export interface GnbHistoryItem {
@@ -62,10 +81,7 @@ function GnbHistoryPanel({
   items: GnbHistoryItem[];
   onClose: () => void;
 }) {
-  // 삭제는 바로 지우지 않고 확인창을 먼저 띄운다 — Figma에는 이 확인창
-  // 디자인이 없지만(삭제 아이콘만 있음), 되돌릴 수 없는 삭제라 실수 방지
-  // 차원에서 둔다. 기존 범용 Popover(alert-dialog 기반 확인 모달)를 그대로
-  // 재사용한다.
+  // 삭제 확인창 (docs/components/gnb.md 참고)
   const [pendingDeleteIndex, setPendingDeleteIndex] = React.useState<
     number | null
   >(null);
@@ -193,21 +209,82 @@ function GnbHistoryPanel({
   );
 }
 
-/**
- * 메인 사이드바. Expand/Type/Style 세 축을 "activeId 하나 + disabledIds 목록"
- * 으로 축약했습니다(ButtonGroup과 동일한 패턴). 로고는 `/public/images/logo.png` 에셋을 사용합니다.
- *
- * 알림벨/Settings/네비게이션 항목 전부 `MenuButton` 하나로 조합합니다 — Figma
- * 구조상 알림벨도 Part/GNB(펼침)·Button(접힘) 패턴을 그대로 따르는 네비 항목일
- * 뿐, 별도 컴포넌트가 아닙니다. 읽지 않음 여부만 아이콘 자체를 `dot-bell-icon`
- * (벨+점 단일 에셋)과 순수 `Bell`로 바꿔 표현합니다. 알림 드롭다운은 벨
- * 아이콘에 앵커된 Radix Popover(`NotiDropdown`)로 구현합니다. Settings 클릭은
- * 콜백만 노출하고 플라이아웃 패널 구현은 후속 작업입니다.
- *
- * GNB 계열(MenuButton/NotiDropdown 포함)은 Figma 실측상 항상 다크로
- * 렌더링됩니다(`--background-subtlest` 등 시맨틱 토큰의 다크값과 스크린샷이
- * 일치) — Popover/Chatbox와 동일한 `.dark` 스코프 트릭을 루트에 적용합니다.
- */
+/** Setting 패널 메뉴 6행의 id (Figma `Part/GNB` 라벨과 1:1 대응) */
+export type GnbSettingSection =
+  | "notification"
+  | "general"
+  | "account"
+  | "privacy"
+  | "billing"
+  | "usage";
+
+const SETTING_SECTIONS: {
+  id: GnbSettingSection;
+  label: string;
+  icon: LucideIcon;
+}[] = [
+  { id: "notification", label: "Notification", icon: Bell },
+  { id: "general", label: "General", icon: SettingsIcon },
+  { id: "account", label: "Account", icon: UserRound },
+  { id: "privacy", label: "Privacy", icon: Shield },
+  { id: "billing", label: "Billing", icon: CreditCard },
+  { id: "usage", label: "Usage", icon: BarChartBig },
+];
+
+/** Setting 패널 — 헤더 없이 검색창+메뉴 6행만 쌓인다 (docs/components/gnb.md 참고) */
+function GnbSettingPanel({
+  activeSection,
+  searchValue,
+  defaultSearchValue,
+  onSearchChange,
+  onSectionSelect,
+}: {
+  activeSection: GnbSettingSection | null;
+  searchValue?: string;
+  defaultSearchValue?: string;
+  onSearchChange?: (value: string) => void;
+  onSectionSelect?: (section: GnbSettingSection) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "dark flex h-full w-[250px] flex-col items-start gap-[var(--gb-spacing-2-5)]",
+        "bg-[var(--gb-background-subtlest)] px-[var(--gb-spacing-2)] py-[var(--gb-spacing-5)]",
+      )}
+    >
+      <InputSearch
+        value={searchValue}
+        defaultValue={defaultSearchValue}
+        onValueChange={onSearchChange}
+        className="h-[32px] w-[234px]"
+      />
+      <ul
+        className={cn(
+          "flex w-full flex-col items-start gap-[var(--gb-spacing-2-5)]",
+          "border-l-[length:var(--gb-border-1)] border-[var(--gb-border-selected)] pl-[var(--gb-spacing-3-5)]",
+        )}
+      >
+        {SETTING_SECTIONS.map(({ id, label, icon }, index) => (
+          <li
+            key={id}
+            className={cn("w-full shrink-0", index === 0 && "mt-[60px]")}
+          >
+            <MenuButton
+              type="icon-with-text"
+              icon={icon}
+              label={label}
+              status={activeSection === id ? "active" : "default"}
+              onClick={() => onSectionSelect?.(id)}
+              className="w-full"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** 메인 사이드바 (docs/components/gnb.md 참고) */
 export interface GnbItem {
   id: string;
   icon: LucideIcon;
@@ -231,12 +308,19 @@ export interface GnbProps {
   notificationItems?: NotiDropdownItem[];
   onToggleNotification?: (open: boolean) => void;
   onNotificationSettingsClick?: () => void;
-  /** Settings 메뉴 클릭 콜백 (플라이아웃 패널은 후속 작업) */
+  /** Settings 메뉴 클릭 콜백 (Setting 패널 토글과 별개로 항상 함께 호출됨) */
   onSettingsClick?: () => void;
   /** Work History 드로어에 전달할 항목 목록 */
   workHistoryItems?: GnbHistoryItem[];
   /** Self Archive 드로어에 전달할 항목 목록 */
   selfArchiveItems?: GnbHistoryItem[];
+  /** Setting 패널 메뉴 행 클릭 콜백 */
+  onSettingSectionSelect?: (section: GnbSettingSection) => void;
+  /** Setting 패널 검색창의 제어 컴포넌트 값 */
+  settingSearchValue?: string;
+  /** Setting 패널 검색창의 비제어 초기값 */
+  defaultSettingSearchValue?: string;
+  onSettingSearchChange?: (value: string) => void;
   className?: string;
 }
 
@@ -254,25 +338,40 @@ export function Gnb({
   onSettingsClick,
   workHistoryItems = [],
   selfArchiveItems = [],
+  onSettingSectionSelect,
+  settingSearchValue,
+  defaultSettingSearchValue,
+  onSettingSearchChange,
   className,
 }: GnbProps) {
   const [notificationOpen, setNotificationOpen] = React.useState(false);
   const [activeDrawer, setActiveDrawer] = React.useState<
-    "work-history" | "self-archive" | null
+    "work-history" | "self-archive" | "setting" | null
   >(null);
+  const [activeSettingSection, setActiveSettingSection] =
+    React.useState<GnbSettingSection | null>(null);
   const menuType = expanded ? "icon-with-text" : "icon";
 
-  // Figma 실측: 토글은 "현재 보이는 패널 전체 폭(레일 48/250px + 열려있으면 드로어
-  // 407px) + 20px" 위치에 고정된다 — 레일-패널 사이는 0px(완전 플러시)이고, 20px
-  // 간격은 패널과 토글 사이의 것이다. 레일 폭(expanded)과 드로어 폭(activeDrawer)
-  // 은 서로 다른 CSS 속성으로 나눠서 적용한다 — `left`(레일 폭 축)는 레일 자신의
-  // width 트랜지션과 같은 200ms로 함께 움직여야 레일이 다 접히기 전에 토글만
-  // 먼저 도착해버리는 어긋남이 안 생기고, `transform`(드로어 폭 축)은 드로어가
-  // 실제로 즉시 나타나고 사라지는 것과 맞춰 트랜지션 없이 바로 스냅한다.
-  const toggleLeft = (expanded ? 250 : 48) + 20;
-  const toggleDrawerOffset = activeDrawer ? 407 : 0;
+  const handleSettingSectionSelect = (section: GnbSettingSection) => {
+    setActiveSettingSection(section);
+    onSettingSectionSelect?.(section);
+  };
 
-  const toggleDrawer = (drawer: "work-history" | "self-archive") => {
+  // 알림 → Setting의 Notification 섹션 바로 이동 (docs/components/gnb.md 참고)
+  const handleNotificationSettingsClick = () => {
+    setNotificationOpen(false);
+    setActiveDrawer("setting");
+    handleSettingSectionSelect("notification");
+    onNotificationSettingsClick?.();
+  };
+
+  // 토글 위치: left=레일 폭 축, transform=드로어 폭 축 (docs/components/gnb.md 참고)
+  const toggleLeft = (expanded ? 250 : 48) + 20;
+  const toggleDrawerOffset = activeDrawer === "work-history" || activeDrawer === "self-archive" ? 407 : 0;
+
+  const toggleDrawer = (
+    drawer: "work-history" | "self-archive" | "setting",
+  ) => {
     setActiveDrawer((prev) => (prev === drawer ? null : drawer));
   };
 
@@ -338,7 +437,8 @@ export function Gnb({
           >
             <NotiDropdown
               items={notificationItems}
-              onSettingsClick={onNotificationSettingsClick}
+              onSettingsClick={handleNotificationSettingsClick}
+              onItemClick={handleNotificationSettingsClick}
             />
           </PopoverPrimitive.Content>
         </PopoverPrimitive.Portal>
@@ -348,8 +448,13 @@ export function Gnb({
         type={menuType}
         icon={SettingsIcon}
         label="Settings"
+        status={activeDrawer === "setting" ? "active" : "default"}
         aria-label={expanded ? undefined : "Settings"}
-        onClick={onSettingsClick}
+        onClick={() => {
+          if (activeDrawer !== "setting") setActiveSettingSection(null);
+          toggleDrawer("setting");
+          onSettingsClick?.();
+        }}
         className="w-full"
       />
 
@@ -363,7 +468,9 @@ export function Gnb({
       >
         {items.map((item) => {
           const isDisabled = disabledIds.includes(item.id);
-          const isActive = !isDisabled && item.id === activeId;
+          // Setting이 열려있는 동안은 끔 (docs/components/gnb.md 참고)
+          const isActive =
+            !isDisabled && item.id === activeId && activeDrawer !== "setting";
 
           return (
             <MenuButton
@@ -373,7 +480,10 @@ export function Gnb({
               label={item.label}
               aria-label={expanded ? undefined : item.label}
               status={isDisabled ? "disabled" : isActive ? "active" : "default"}
-              onClick={() => onItemSelect?.(item.id)}
+              onClick={() => {
+                if (activeDrawer === "setting") setActiveDrawer(null);
+                onItemSelect?.(item.id);
+              }}
               className="w-full"
             />
           );
@@ -382,50 +492,49 @@ export function Gnb({
 
       </div>
 
-      {/* Work History/Self Archive 트리거 — GNB 패널 바깥 우측에 독립적으로 떠
-          있는 2연 세그먼트(`Toggle`). 메인 패널이 overflow-hidden이라 그 안에
-          두면 패널 박스 밖으로 나온 부분이 잘려서, 바깥 래퍼 기준 절대위치로
-          둔다. `left`(레일 폭 축)는 레일 자신의 width 트랜지션과 같은 200ms로
-          같이 움직이고, `transform`(드로어 폭 축)은 트랜지션 없이 즉시
-          스냅한다 — 서로 다른 CSS 속성으로 나눠야 레일이 다 접히기 전에
-          토글만 먼저 도착하는 어긋남 없이, 드로어는 여전히 즉시 나타난다.
-          둘 다 닫힘에서 시작, 누른 쪽만 열리고 같은 걸 다시 누르면 닫힌다
-          (상호 배타 + 재클릭 닫기는 selectionMode로 표현이 안 돼 activeDrawer
-          상태로 직접 제어). */}
-      <Toggle
-        type="icon"
-        selectionMode="multiple"
-        className="absolute top-[20px] z-20 transition-[left] duration-200 ease-linear"
-        style={{
-          left: `${toggleLeft}px`,
-          transform: `translateX(${toggleDrawerOffset}px)`,
-        }}
-        items={[
-          {
-            icon: <History aria-hidden="true" className="size-full" />,
-            "aria-label": "Work history",
-            pressed: activeDrawer === "work-history",
-            onPressedChange: () => toggleDrawer("work-history"),
-          },
-          {
-            icon: <Archive aria-hidden="true" className="size-full" />,
-            "aria-label": "Self archive",
-            pressed: activeDrawer === "self-archive",
-            onPressedChange: () => toggleDrawer("self-archive"),
-          },
-        ]}
-      />
+      {/* Work History/Self Archive 트리거 (docs/components/gnb.md 참고) */}
+      {activeDrawer !== "setting" && (
+        <Toggle
+          type="icon"
+          selectionMode="multiple"
+          className="absolute top-[20px] z-20 transition-[left] duration-200 ease-linear"
+          style={{
+            left: `${toggleLeft}px`,
+            transform: `translateX(${toggleDrawerOffset}px)`,
+          }}
+          items={[
+            {
+              icon: <History aria-hidden="true" className="size-full" />,
+              "aria-label": "Work history",
+              pressed: activeDrawer === "work-history",
+              onPressedChange: () => toggleDrawer("work-history"),
+            },
+            {
+              icon: <Archive aria-hidden="true" className="size-full" />,
+              "aria-label": "Self archive",
+              pressed: activeDrawer === "self-archive",
+              onPressedChange: () => toggleDrawer("self-archive"),
+            },
+          ]}
+        />
+      )}
 
-      {/* Work History/Self Archive 패널 — Figma상 GNB 자신의 variant라, 별도
-          오버레이가 아니라 GNB 본체와 나란한 flex 형제로 붙여 전체 폭이 함께
-          넓어지게 한다. */}
-      {activeDrawer && (
+      {/* Work History/Self Archive/Setting 패널 (docs/components/gnb.md 참고) */}
+      {activeDrawer === "setting" ? (
+        <GnbSettingPanel
+          activeSection={activeSettingSection}
+          searchValue={settingSearchValue}
+          defaultSearchValue={defaultSettingSearchValue}
+          onSearchChange={onSettingSearchChange}
+          onSectionSelect={handleSettingSectionSelect}
+        />
+      ) : activeDrawer ? (
         <GnbHistoryPanel
           title={activeDrawer === "work-history" ? "Work History" : "Self Archive"}
           items={activeDrawer === "work-history" ? workHistoryItems : selfArchiveItems}
           onClose={() => setActiveDrawer(null)}
         />
-      )}
+      ) : null}
     </div>
   );
 }

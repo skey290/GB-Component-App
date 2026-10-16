@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs";
-import { Blocks, Compass, Home, UserSearch } from "lucide-react";
+import { Blocks, Compass, Home, UserRoundSearch } from "lucide-react";
 import { fn } from "storybook/test";
 
 import { Gnb, type GnbItem, type GnbProps } from "./gnb";
@@ -19,7 +19,7 @@ const items: GnbItem[] = [
   { id: "assets", icon: AssetIcon, label: "Assets" },
   { id: "compass", icon: Compass, label: "Compass" },
   { id: "contents-studio", icon: Blocks, label: "Contents Studio" },
-  { id: "know-thyself", icon: UserSearch, label: "Know Thyself" },
+  { id: "know-thyself", icon: UserRoundSearch, label: "Know Thyself" },
 ];
 
 const notificationItems: NotiDropdownItem[] = [
@@ -94,6 +94,8 @@ const meta = {
     onSettingsClick: fn(),
     onToggleNotification: fn(),
     onNotificationSettingsClick: fn(),
+    onSettingSectionSelect: fn(),
+    onSettingSearchChange: fn(),
   },
   render: (args) => <ControlledGnb {...args} />,
 } satisfies Meta<typeof Gnb>;

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Blocks, Compass, Home, UserSearch } from "lucide-react";
+import { Blocks, Compass, Home, UserRoundSearch } from "lucide-react";
 
 import { Gnb, type GnbItem } from "./gnb";
 import { createSpriteIcon } from "@/lib/sprite-icon";
@@ -14,7 +14,7 @@ const items: GnbItem[] = [
   { id: "assets", icon: AssetIcon, label: "Assets" },
   { id: "compass", icon: Compass, label: "Compass" },
   { id: "contents-studio", icon: Blocks, label: "Contents Studio" },
-  { id: "know-thyself", icon: UserSearch, label: "Know Thyself" },
+  { id: "know-thyself", icon: UserRoundSearch, label: "Know Thyself" },
 ];
 
 describe("Gnb", () => {
@@ -136,7 +136,7 @@ describe("Gnb", () => {
     expect(onSettingsClick).toHaveBeenCalledTimes(1);
   });
 
-  it("shows the dot-bell icon only when unreadCount > 0", () => {
+  it("shows the unread dot on the bell only when unreadCount > 0", () => {
     const { rerender } = render(
       <Gnb
         expanded={false}
@@ -145,11 +145,11 @@ describe("Gnb", () => {
         unreadCount={0}
       />,
     );
-    const getNotificationUse = () =>
+    const getUnreadDot = () =>
       screen
         .getByRole("button", { name: "Notification" })
-        .querySelector("use");
-    expect(getNotificationUse()).not.toBeInTheDocument();
+        .querySelector('[data-testid="unread-dot"]');
+    expect(getUnreadDot()).not.toBeInTheDocument();
 
     rerender(
       <Gnb
@@ -159,10 +159,7 @@ describe("Gnb", () => {
         unreadCount={3}
       />,
     );
-    expect(getNotificationUse()).toHaveAttribute(
-      "href",
-      "/icons.svg#dot-bell-icon",
-    );
+    expect(getUnreadDot()).toBeInTheDocument();
   });
 
   it("opens the notification dropdown when the bell is clicked and calls onToggleNotification", async () => {
@@ -182,5 +179,118 @@ describe("Gnb", () => {
 
     expect(onToggleNotification).toHaveBeenCalledWith(true);
     expect(await screen.findByText("Hello world")).toBeInTheDocument();
+  });
+
+  it("opens the Setting panel when Settings is clicked and closes it on a second click", async () => {
+    const user = userEvent.setup();
+    render(<Gnb expanded={true} items={items} activeId="dashboard" />);
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.getByText("Usage")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.queryByText("Usage")).not.toBeInTheDocument();
+  });
+
+  it("closes Work History and opens Setting when Settings is clicked while Work History is open", async () => {
+    const user = userEvent.setup();
+    render(<Gnb expanded={true} items={items} activeId="dashboard" />);
+
+    await user.click(screen.getByRole("button", { name: "Work history" }));
+    expect(screen.getByText("Work History")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.queryByText("Work History")).not.toBeInTheDocument();
+    expect(screen.getByText("Usage")).toBeInTheDocument();
+  });
+
+  it("calls onSettingSectionSelect with the clicked section's id", async () => {
+    const user = userEvent.setup();
+    const onSettingSectionSelect = vi.fn();
+    render(
+      <Gnb
+        expanded={true}
+        items={items}
+        activeId="dashboard"
+        onSettingSectionSelect={onSettingSectionSelect}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(screen.getByRole("button", { name: "Billing" }));
+
+    expect(onSettingSectionSelect).toHaveBeenCalledWith("billing");
+  });
+
+  it("jumps to the Setting panel's Notification section from the notification dropdown's gear icon", async () => {
+    const user = userEvent.setup();
+    const onNotificationSettingsClick = vi.fn();
+    const onSettingSectionSelect = vi.fn();
+    render(
+      <Gnb
+        expanded={true}
+        items={items}
+        activeId="dashboard"
+        notificationItems={[{ id: "1", label: "Hello world" }]}
+        onNotificationSettingsClick={onNotificationSettingsClick}
+        onSettingSectionSelect={onSettingSectionSelect}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Notification" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Notification settings" }),
+    );
+
+    expect(screen.queryByText("Hello world")).not.toBeInTheDocument();
+    expect(onNotificationSettingsClick).toHaveBeenCalledTimes(1);
+    expect(onSettingSectionSelect).toHaveBeenCalledWith("notification");
+    const notificationButtons = screen.getAllByRole("button", {
+      name: "Notification",
+    });
+    expect(notificationButtons[notificationButtons.length - 1]).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+  });
+
+  it("also jumps to the Setting panel's Notification section when a notification list item is clicked", async () => {
+    const user = userEvent.setup();
+    const onSettingSectionSelect = vi.fn();
+    render(
+      <Gnb
+        expanded={true}
+        items={items}
+        activeId="dashboard"
+        notificationItems={[{ id: "1", label: "Hello world" }]}
+        onSettingSectionSelect={onSettingSectionSelect}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Notification" }));
+    await user.click(
+      await screen.findByRole("button", { name: "Hello world" }),
+    );
+
+    expect(screen.queryByText("Hello world")).not.toBeInTheDocument();
+    expect(onSettingSectionSelect).toHaveBeenCalledWith("notification");
+  });
+
+  it("calls onSettingSearchChange when typing in the Setting panel's search input (uncontrolled)", async () => {
+    const user = userEvent.setup();
+    const onSettingSearchChange = vi.fn();
+    render(
+      <Gnb
+        expanded={true}
+        items={items}
+        activeId="dashboard"
+        onSettingSearchChange={onSettingSearchChange}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.type(screen.getByPlaceholderText("Search placeholder"), "a");
+
+    expect(onSettingSearchChange).toHaveBeenCalledWith("a");
   });
 });

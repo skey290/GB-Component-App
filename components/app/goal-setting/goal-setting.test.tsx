@@ -68,7 +68,7 @@ describe("GoalSetting", () => {
     expect(within(paragraph2).getByText("5,000")).toBeInTheDocument();
     expect(within(paragraph2).getByText("monthly")).toBeInTheDocument();
     expect(
-      within(paragraph2).getByText("3 times a day"),
+      within(paragraph2).getByText("3 times a day (Daily)"),
     ).toBeInTheDocument();
   });
 

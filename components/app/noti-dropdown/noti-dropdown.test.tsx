@@ -61,6 +61,16 @@ describe("NotiDropdown", () => {
     expect(onSettingsClick).toHaveBeenCalledTimes(1);
   });
 
+  it("calls onItemClick with the clicked item's id", async () => {
+    const user = userEvent.setup();
+    const onItemClick = vi.fn();
+    render(<NotiDropdown items={items} onItemClick={onItemClick} />);
+
+    await user.click(screen.getByRole("button", { name: items[0].label }));
+
+    expect(onItemClick).toHaveBeenCalledWith(items[0].id);
+  });
+
   it("renders nothing in the list when items is empty", () => {
     render(<NotiDropdown items={[]} />);
     expect(screen.queryByText(/notification$/)).not.toBeInTheDocument();
