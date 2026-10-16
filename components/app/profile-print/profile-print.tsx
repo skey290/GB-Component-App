@@ -121,7 +121,7 @@ export function ProfilePrint({
         <>
           <div
             className={cn(
-              "relative flex size-[510px] shrink-0 flex-col items-center justify-center",
+              "dark relative flex size-[510px] shrink-0 flex-col items-center justify-center",
               "gap-[var(--gb-spacing-6)] opacity-[var(--gb-opacity-85)]",
               "border-[length:var(--gb-border-2)] border-dashed border-[var(--gb-border-muted)]",
               "bg-[var(--gb-background-bolder)] backdrop-blur-[var(--gb-backdrop-blur-md)]",
@@ -138,7 +138,7 @@ export function ProfilePrint({
                   <use href="/icons.svg#asset-icon" />
                 </svg>
               </div>
-              <p className="text-lg-medium w-full min-w-full text-center text-[var(--gb-border-overlay)]">
+              <p className="text-lg-medium w-full min-w-full text-center text-[var(--gb-text-popover)]">
                 {`Let's create your brand image!`}
               </p>
               <p className="text-sm-regular w-full min-w-full whitespace-pre-wrap text-center text-[var(--gb-text-selected)]">

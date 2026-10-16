@@ -195,7 +195,7 @@ export function FloatingProfile({
             icon="x-icon"
             onClick={() => setOpen(false)}
             aria-label="닫기"
-            className="absolute right-[var(--gb-spacing-12)] top-[22px] z-[1] text-[var(--gb-border-mute)] hover:text-[var(--gb-border-mute)]"
+            className="absolute right-[var(--gb-spacing-12)] top-[22px] z-[1]"
           />
 
           {/* 역할명 탭 헤더 */}
