@@ -4,8 +4,8 @@ import { fn } from "storybook/test";
 import { FloatingProfile } from "./floating-profile";
 
 const FIGMA_FILE =
-  "https://www.figma.com/design/G9YNa2vjdqDjnML9y5hXJ4/%F0%9F%93%8C-GB_Design-System--Atom-";
-const FIGMA_URL = `${FIGMA_FILE}?node-id=7244-22163`;
+  "https://www.figma.com/design/Wp6AZNGqC4qf2Sz5zQ2PzQ/%F0%9F%93%8C-GB_UXUI--261002-";
+const FIGMA_URL = `${FIGMA_FILE}?node-id=8163-92774`;
 
 const AVATAR_SRC = "/images/personas/self-default.jpg";
 const PORTRAIT_SRC = "/images/personas/self-default.jpg";
@@ -18,6 +18,13 @@ const meta = {
     design: {
       type: "figma",
       url: FIGMA_URL,
+    },
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "프로필 플로팅 패널. 아바타 버블을 클릭하면 역할명/폴라로이드 사진/버튼 4개/태그라인·본문이 담긴 카드가 펼쳐진다. 아바타 이미지가 없으면(Type=no profile) 아이콘 폴백만 표시되고 카드가 열리지 않는다. components/app/floating-profile(FloatingProfile)로 구현된다.",
+      },
     },
   },
   // 카드는 아바타 기준 왼쪽으로 620px 펼쳐짐 — 뷰포트 음수 좌표로 밀려나 보이지

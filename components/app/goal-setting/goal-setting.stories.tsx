@@ -15,6 +15,13 @@ const meta = {
       type: "figma",
       url: FIGMA_URL,
     },
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "코드 구현: components/app/goal-setting/goal-setting.tsx (export GoalSetting). 이 3개 노드(empty/modeling partner/fashionista)는 Figma variant 프로퍼티가 아니라 독립된 컴포넌트지만, 코드에서는 구조적으로 동일한 type=\"empty\"/\"filled\" 두 상태로 통합 구현했다 — modeling partner/fashionista는 filled 상태의 샘플 데이터 2종일 뿐 구조 차이가 없다. 문단 안의 Chips는 brandPosition/target/postingFrequency+postingCount/targetedFollowers/trackingFrequency 값에서 자동 파생되어 하단 입력과 항상 동기화된다. 상세: docs/components/goal-setting.md",
+      },
+    },
   },
   argTypes: {
     type: {

@@ -14,6 +14,13 @@ const meta = {
       type: "figma",
       url: FIGMA_URL,
     },
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "알림 드롭다운 리스트의 행 하나 — 메가폰 아이콘, 라벨, 읽지 않음 dot으로 구성된다. components/app/noti-item(NotiItem)으로 구현된다.",
+      },
+    },
   },
   decorators: [
     (Story) => (

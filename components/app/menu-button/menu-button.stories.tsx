@@ -5,7 +5,7 @@ import { fn } from "storybook/test";
 import { MenuButton } from "./menu-button";
 
 const FIGMA_URL =
-  "https://www.figma.com/design/G9YNa2vjdqDjnML9y5hXJ4/%F0%9F%93%8C-GB_Design-System--Atom-?node-id=3436-812";
+  "https://www.figma.com/design/Wp6AZNGqC4qf2Sz5zQ2PzQ/%F0%9F%93%8C-GB_UXUI--261002-?node-id=8163-93014";
 
 const meta = {
   title: "App/MenuButton",
@@ -15,6 +15,13 @@ const meta = {
     design: {
       type: "figma",
       url: FIGMA_URL,
+    },
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "GNB 내비게이션 행 하나 — 아이콘만/아이콘+라벨/라벨만 중 하나이며, default/active/disabled 상태를 가진다. components/app/menu-button(MenuButton)으로 구현된다.",
+      },
     },
   },
   // GNB(사이드바)는 항상 다크로 렌더링되므로(Figma 실측), 스토리도 다크 배경 위에서 확인합니다.

@@ -35,6 +35,15 @@ const meta = {
   title: "App/ChatboxComposer",
   component: ChatboxComposer,
   tags: ["autodocs"],
+  parameters: {
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "Chatbox의 슬롯에 들어가는 콘텐츠 — 삭제 배지가 있는 이미지 썸네일, 삭제 아이콘이 있는 필터 chips, 또는 sentence option 중 하나. components/app/chatbox-composer(ChatboxComposer)로 구현된다. Type=options(sentence-option)의 3개 행은 아이콘 없이 라벨이 가운데 정렬되며, 기본적으로 전부 미선택 상태다(Figma에 선택됨 전용 variant가 없어, 클릭 후 강조 색은 코드가 Button의 Status=active 토큰을 재사용한 것).",
+      },
+    },
+  },
   argTypes: {
     variant: {
       control: "select",

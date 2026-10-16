@@ -5,7 +5,7 @@ import { fn } from "storybook/test";
 import { NotiDropdown, type NotiDropdownProps } from "./noti-dropdown";
 
 const FIGMA_URL =
-  "https://www.figma.com/design/G9YNa2vjdqDjnML9y5hXJ4/%F0%9F%93%8C-GB_Design-System--Atom-?node-id=4979-11016";
+  "https://www.figma.com/design/Wp6AZNGqC4qf2Sz5zQ2PzQ/%F0%9F%93%8C-GB_UXUI--261002-?node-id=8163-93051";
 
 const items = [
   { id: "1", label: "notification placeholder", unread: true },
@@ -46,6 +46,13 @@ const meta = {
     design: {
       type: "figma",
       url: FIGMA_URL,
+    },
+    // Figma 컴포넌트 description 필드 원문
+    docs: {
+      description: {
+        component:
+          "GNB 벨 아이콘을 클릭하면 열리는 알림 드롭다운 패널 — All/Unread 탭과 스크롤 가능한 항목 리스트로 구성된다. components/app/noti-dropdown(NotiDropdown)으로 구현된다.",
+      },
     },
   },
   argTypes: {
